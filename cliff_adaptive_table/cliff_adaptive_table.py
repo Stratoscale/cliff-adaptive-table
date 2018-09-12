@@ -1,8 +1,6 @@
-import re
 from cliff.formatters.base import ListFormatter, SingleFormatter
 
 from adaptive_table import AdaptiveTable
-import modifier
 from filter_data import FilterData
 
 

@@ -1,0 +1,7 @@
+version: 2
+
+services:
+
+    cliff-adaptive-table:
+        pips:
+        - dist/cliff-adaptive-table-0.1.tar.gz

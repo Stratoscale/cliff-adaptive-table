@@ -1,3 +1,4 @@
+import yaml
 import fcntl
 import struct
 import termios
@@ -20,7 +21,7 @@ class AdaptiveTable(object):
                  force_frames=False,
                  horizontal_lines=False,
                  split_words=SplitWords.WHEN_NECESSARY,
-                 sort_order=None):
+                 sort_order='name,id'):
         self._terminal_size = terminal_size
         self._max_str_length = max_str_length
         self._max_depth = max_depth
@@ -84,7 +85,7 @@ class AdaptiveTable(object):
 
     def _split_string(self, string, max_str_length):
         def _simple_split(string, max_str_length):
-            return [string[0+i:max_str_length+i] for i in range(0, len(string), max_str_length)]
+            return [string[0 + i:max_str_length + i] for i in range(0, len(string), max_str_length)]
 
         def _append_word(line, word):
             if line:
@@ -135,7 +136,7 @@ class AdaptiveTable(object):
             if not data:
                 return {}
             table = [[self._split_string(key, max_str_length),
-                      self._format_cell(value, depth+1, compact, max_str_length)] for key, value in sorted(data.iteritems())]
+                      self._format_cell(value, depth + 1, compact, max_str_length)] for key, value in sorted(data.iteritems())]
             return self._format_table(None, table, depth, compact)
 
         if isinstance(data, (list, tuple)):
@@ -153,7 +154,7 @@ class AdaptiveTable(object):
             formatted = self._format_table(headers, table, depth, compact)
             non_dicts = [self._format_cell(item, depth + 1, compact, max_str_length) for item in data if not isinstance(item, dict)]
             if non_dicts:
-                non_dicts_table = [[self._format_cell(value, depth+1, compact, max_str_length)] for value in non_dicts]
+                non_dicts_table = [[self._format_cell(value, depth + 1, compact, max_str_length)] for value in non_dicts]
                 return self._format_table(None, non_dicts_table, depth, compact)
             return formatted
         return str(data)
