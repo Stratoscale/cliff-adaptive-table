@@ -1,3 +1,5 @@
+import modifier
+
 def _filter_data(data, greps, reverse_greps):
     def _matches(data, pattern):
         if isinstance(data, dict):
@@ -33,12 +35,27 @@ def _filter_columns(data, column_patterns):
         return _filter_columns(data, column_patterns)
 
 
-def filter_data(data, columns, greps, reverse_greps, head, tail):
+def parse_modifiers(args):
+    MODIFIERS = {'grep': modifier.append_regex,
+                 'grep-v': modifier.append_case_insensitive_regex,
+                 'grep-i': modifier.append_regex,
+                 'grep-iv': modifier.append_case_insensitive_regex,
+                 'grep-vi': modifier.append_case_insensitive_regex,
+                 'columns': modifier.append_regex,
+                 'head': modifier.to_int,
+                 'tail': modifier.to_int}
+
+    return modifier.parse_modifiers(MODIFIERS, args)
+
+
+def filter_data(data, modifiers):
+    greps = modifiers.get('grep', []) + modifiers.get('grep-i', [])
+    reverse_greps = modifiers.get('grep-v', []) + modifiers.get('grep-vi', []) + modifiers.get('grep-iv', [])
     data = _filter_data(data, greps, reverse_greps)
-    data = _filter_columns(data, columns)
+    data = _filter_columns(data, modifiers.get('columns'))
     if isinstance(data, list):
-        if head:
-            data = data[:head]
-        if tail:
-            data = data[-tail:]
+        if 'head' in modifiers:
+            data = data[:modifiers['head']]
+        if 'tail' in modifiers:
+            data = data[-modifiers['tail']:]
     return data

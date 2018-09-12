@@ -1,9 +1,33 @@
-def csv(value):
-    return value.split(',')
+import re
 
-def boolean(value):
-    return {'yes': True, 'y': True, 't': True, 'true': True,
-            'n': False, 'no': False, 'f': False, 'false': False}[value.lower()]
+
+def csv(recognized, key, value):
+    recognized[key] = value.split(',')
+
+
+def boolean(recognized, key, value):
+    recognized[key] = {'yes': True, 'y': True, 't': True, 'true': True,
+                      'n': False, 'no': False, 'f': False, 'false': False}[value.lower()]
+
+
+def to_int(recognized, key, value):
+    recognized[key] = int(value)
+
+
+def to_str(recognized, key, value):
+    recognized[key] = value
+
+
+def append_regex(recognized, key, value, flags=0):
+    pattern = re.compile(value, flags)
+    if key not in recognized:
+        recognized[key] = []
+    recognized[key].append(pattern)
+
+
+def append_case_insensitive_regex(recognized, key, value):
+    append_regex(recognized, key, re.IGNORECASE)
+
 
 def parse_modifiers(modifiers, args):
     unrecognized = []
@@ -12,7 +36,7 @@ def parse_modifiers(modifiers, args):
         try:
             key, value = arg.split('=', 1)
             if key in modifiers:
-                recognized[key] = modifiers[key](value)
+                modifiers[key](recognized, key, value)
             else:
                 unrecognized.append(arg)
         except:
