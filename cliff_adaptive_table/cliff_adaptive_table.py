@@ -5,10 +5,14 @@ from adaptive_table import AdaptiveTable
 class AdaptiveTableFormatter(ListFormatter, SingleFormatter):
 
     def add_argument_group(self, parser):
-        pass
+        group = parser.add_argument_group('adaptive table formatter')
+        group.add_argument('-m', '--modifiers', nargs='*', help='modifiers')
 
     def _emit(self, data, stdout, parsed_args):
         adaptive_table = AdaptiveTable()
+        unrecognized_modifiers = adaptive_table.parse_modifiers(parsed_args.modifiers)
+        if unrecognized_modifiers:
+            stdout.write('unrecognized modifiers: %s\n' % (', '.join(unrecognized_modifiers)))
         stdout.write(adaptive_table.format(data))
         stdout.write('\n')
 

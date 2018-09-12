@@ -3,7 +3,7 @@ import struct
 import termios
 
 from adaptive_table_def import AdaptiveTableDef
-
+from modifier import parse_modifiers, csv, boolean
 
 class SplitWords(object):
     ALWAYS = 'always'
@@ -26,9 +26,26 @@ class AdaptiveTable(object):
         self._force_frames = force_frames
         self._split_words = split_words
         self._horizontal_lines = horizontal_lines
-        if sort_order:
-            sort_order = {key.lower(): index - len(sort_order) for index, key in enumerate(sort_order)}
-            self._key_sorter = lambda item: [sort_order.get(str(item).lower(), 0), item]
+        self._sort_order = sort_order
+        self._set_key_sorter()
+
+    def parse_modifiers(self, args):
+        MODIFIERS = {'terminal-size': int,
+                     'force-frames': boolean,
+                     'horizontal-lines': boolean,
+                     'split-words': str,
+                     'sort-order': csv,
+                     'max-str-length': int}
+        recognized, unrecognized = parse_modifiers(MODIFIERS, args)
+        for key, value in recognized.iteritems():
+            setattr(self, '_' + key.replace('-', '_'), value)
+        self._set_key_sorter()
+        return unrecognized
+
+    def _set_key_sorter(self):
+        if self._sort_order:
+            self._sort_order = {key.lower(): index - len(self._sort_order) for index, key in enumerate(self._sort_order)}
+            self._key_sorter = lambda item: [self._sort_order.get(str(item).lower(), 0), item]
         else:
             self._key_sorter = lambda item: item
 
