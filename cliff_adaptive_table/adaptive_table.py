@@ -21,14 +21,14 @@ class AdaptiveTable(object):
                  force_frames=False,
                  horizontal_lines=False,
                  split_words=SplitWords.WHEN_NECESSARY,
-                 sort_order='name,id'):
+                 column_order='name,id'):
         self._terminal_size = terminal_size
         self._max_str_length = max_str_length
         self._max_depth = max_depth
         self._force_frames = force_frames
         self._split_words = split_words
         self._horizontal_lines = horizontal_lines
-        self._sort_order = sort_order or ['name', 'id']
+        self._column_order = column_order or ['name', 'id']
         self._set_key_sorter()
 
     def parse_modifiers(self, args):
@@ -36,7 +36,7 @@ class AdaptiveTable(object):
                      'force-frames': modifier.boolean,
                      'horizontal-lines': modifier.boolean,
                      'split-words': modifier.to_str,
-                     'sort-order': modifier.csv,
+                     'column-order': modifier.csv,
                      'max-str-length': modifier.to_int}
         recognized, unrecognized = modifier.parse_modifiers(MODIFIERS, args)
         for key, value in recognized.iteritems():
@@ -45,9 +45,9 @@ class AdaptiveTable(object):
         return unrecognized
 
     def _set_key_sorter(self):
-        if self._sort_order:
-            self._sort_order = {key.lower(): index - len(self._sort_order) for index, key in enumerate(self._sort_order)}
-            self._key_sorter = lambda item: [self._sort_order.get(str(item).lower(), 0), item]
+        if self._column_order:
+            self._column_order = {key.lower(): index - len(self._column_order) for index, key in enumerate(self._column_order)}
+            self._key_sorter = lambda item: [self._column_order.get(str(item).lower(), 0), item]
         else:
             self._key_sorter = lambda item: item
 

@@ -35,12 +35,12 @@ All modifiers are of the form name=value. Supported modifiers are:
 
 ## Display Modifiers
 Valid boolean values are true, t, yes, y, false, f, no, and n (case-insensitive)
-- **terminal-size=int** - force a terminal size instead of using the auto-detected value
+- **column-order=csv** - a comma-seperated list of column names. Columns are sorted first by this list and the alphabetically. Default: name,id
 - **force-frames=bool** - force frames around all sub-objects
 - **horizontal-lines=bool** - force horizontal lines between each row
 - **split-words** - any of always, when-neccessary, or never:
   - when-neccessary - default behaviour. cell values are split between words, and only words longer than the cell width are split
   - always - split cell values disregarding word limits. Might result in slightly shorter tables
   - never - turns off splitting of cell values, so the table looks like the _table_ formatter
-- **sort-order=csv** - a comma-seperated list of column names. Columns are sorted first by this list and the alphabetically. Default: name,id
+- **terminal-size=int** - force a terminal size instead of using the auto-detected value
 - **max-str-length=int** - maximum string length to split cell values to. If the table does not fit in the terminal, cliff-adaptive-table performs binary search on the optimal number of characters to split column values. This modifiers determines the limit of the binary search. Default: 100
