@@ -1,3 +1,4 @@
+import uuid
 import yaml
 import fcntl
 import struct
@@ -9,6 +10,7 @@ import modifier
 
 class SplitWords(object):
     ALWAYS = 'always'
+    EXCEPT_IDS = 'except-ids'
     WHEN_NECESSARY = 'when-neccessary'
     NEVER = 'never'
 
@@ -20,7 +22,7 @@ class AdaptiveTable(object):
                  max_depth=None,
                  force_frames=False,
                  horizontal_lines=False,
-                 split_words=SplitWords.WHEN_NECESSARY,
+                 split_words=SplitWords.EXCEPT_IDS,
                  column_order='name,id'):
         self._terminal_size = terminal_size
         self._max_str_length = max_str_length
@@ -96,8 +98,14 @@ class AdaptiveTable(object):
         string = str(string)
         if not max_str_length:
             return string
-        if self._split_words is SplitWords.ALWAYS:
+        if self._split_words == SplitWords.ALWAYS:
             return '\n'.join(_simple_split(string, max_str_length))
+        if self._split_words == SplitWords.EXCEPT_IDS:
+            try:
+                uuid.UUID(string)
+                return string
+            except:
+                pass
         lines = []
         current_line = ''
         for word in string.split():
@@ -109,7 +117,7 @@ class AdaptiveTable(object):
                         lines.append(current_line)
                     current_line = word
                 else:
-                    if self._split_words is SplitWords.WHEN_NECESSARY:
+                    if self._split_words in (SplitWords.EXCEPT_IDS, SplitWords.WHEN_NECESSARY):
                         space_left = max(0, max_str_length - len(current_line) - (1 if current_line else 0))
                         if space_left:
                             lines.append(_append_word(current_line, word[:space_left]))

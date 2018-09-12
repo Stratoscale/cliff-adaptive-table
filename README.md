@@ -39,7 +39,8 @@ Valid boolean values are true, t, yes, y, false, f, no, and n (case-insensitive)
 - **force-frames=bool** - force frames around all sub-objects
 - **horizontal-lines=bool** - force horizontal lines between each row
 - **split-words** - any of always, when-neccessary, or never:
-  - when-neccessary - default behaviour. cell values are split between words, and only words longer than the cell width are split
+  - when-necessary - cell values are split between words, and only words longer than the cell width are split
+  - except-ids - same as _when-necessary_ except that UUIDs are never split. This is the default
   - always - split cell values disregarding word limits. Might result in slightly shorter tables
   - never - turns off splitting of cell values, so the table looks like the _table_ formatter
 - **terminal-size=int** - force a terminal size instead of using the auto-detected value
