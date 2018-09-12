@@ -7,7 +7,7 @@ def csv(recognized, key, value):
 
 def boolean(recognized, key, value):
     recognized[key] = {'yes': True, 'y': True, 't': True, 'true': True,
-                      'n': False, 'no': False, 'f': False, 'false': False}[value.lower()]
+                       'n': False, 'no': False, 'f': False, 'false': False}[value.lower()]
 
 
 def to_int(recognized, key, value):

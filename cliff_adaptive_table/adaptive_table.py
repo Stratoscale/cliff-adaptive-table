@@ -5,6 +5,7 @@ import termios
 from adaptive_table_def import AdaptiveTableDef
 import modifier
 
+
 class SplitWords(object):
     ALWAYS = 'always'
     WHEN_NECESSARY = 'when-neccessary'
@@ -26,7 +27,7 @@ class AdaptiveTable(object):
         self._force_frames = force_frames
         self._split_words = split_words
         self._horizontal_lines = horizontal_lines
-        self._sort_order = sort_order
+        self._sort_order = sort_order or ['name', 'id']
         self._set_key_sorter()
 
     def parse_modifiers(self, args):

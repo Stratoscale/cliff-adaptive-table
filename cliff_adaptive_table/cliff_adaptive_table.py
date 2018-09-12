@@ -3,7 +3,7 @@ from cliff.formatters.base import ListFormatter, SingleFormatter
 
 from adaptive_table import AdaptiveTable
 import modifier
-import filter_data
+from filter_data import FilterData
 
 
 class AdaptiveTableFormatter(ListFormatter, SingleFormatter):
@@ -14,11 +14,12 @@ class AdaptiveTableFormatter(ListFormatter, SingleFormatter):
 
     def _emit(self, data, stdout, parsed_args):
         adaptive_table = AdaptiveTable()
+        filter_data = FilterData()
         non_table_modifiers = adaptive_table.parse_modifiers(parsed_args.modifiers)
-        filter_modifiers, unrecognized_modifiers = filter_data.parse_modifiers(non_table_modifiers)
+        unrecognized_modifiers = filter_data.parse_modifiers(non_table_modifiers)
         if unrecognized_modifiers:
             stdout.write('unrecognized modifiers: %s\n' % (', '.join(unrecognized_modifiers)))
-        data = filter_data.filter_data(data, filter_modifiers)
+        data = filter_data.filter_data(data)
         stdout.write(adaptive_table.format(data))
         stdout.write('\n')
 
