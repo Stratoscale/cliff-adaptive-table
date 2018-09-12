@@ -14,7 +14,7 @@ pip install dist/cliff-adaptive-table-*.tar.gz
 
 ## Usage
 ```
-symp> command argument --flag --format adaptive_table [-m modifier [modifier...]]
+symp> command [argument [argument...]] [--flag] --format adaptive_table [-m modifier [modifier...]]
 ```
 
 ## Filter Modifiers
