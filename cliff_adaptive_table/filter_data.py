@@ -12,8 +12,8 @@ class FilterData(object):
             return pattern.search(str(data))
 
         def _filter(data, greps, reverse_greps):
-            return all(_matches(value, pattern) for pattern in greps) and \
-                not (reverse_greps and all(_matches(value, pattern) for pattern in reverse_greps))
+            return all(_matches(data, pattern) for pattern in greps) and \
+                not (reverse_greps and all(_matches(data, pattern) for pattern in reverse_greps))
 
         if not greps and not reverse_greps:
             return data
@@ -38,8 +38,8 @@ class FilterData(object):
 
     def parse_modifiers(self, args):
         MODIFIERS = {'grep': modifier.append_regex,
-                     'grep-v': modifier.append_case_insensitive_regex,
-                     'grep-i': modifier.append_regex,
+                     'grep-v': modifier.append_regex,
+                     'grep-i': modifier.append_case_insensitive_regex,
                      'grep-iv': modifier.append_case_insensitive_regex,
                      'grep-vi': modifier.append_case_insensitive_regex,
                      'columns': modifier.append_regex,
@@ -47,6 +47,7 @@ class FilterData(object):
                      'tail': modifier.to_int}
 
         self._modifiers, unrecognized_modifiers = modifier.parse_modifiers(MODIFIERS, args)
+        return unrecognized_modifiers
 
     def filter_data(self, data):
         greps = self._modifiers.get('grep', []) + self._modifiers.get('grep-i', [])

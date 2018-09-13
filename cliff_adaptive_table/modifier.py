@@ -26,7 +26,7 @@ def append_regex(recognized, key, value, flags=0):
 
 
 def append_case_insensitive_regex(recognized, key, value):
-    append_regex(recognized, key, re.IGNORECASE)
+    append_regex(recognized, key, value, re.IGNORECASE)
 
 
 def parse_modifiers(modifiers, args):
