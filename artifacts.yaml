@@ -4,4 +4,4 @@ services:
 
     cliff-adaptive-table:
         pips:
-        - dist/cliff-adaptive-table-0.1.tar.gz
+        - dist/cliff-adaptive-table-*.tar.gz

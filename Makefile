@@ -9,4 +9,3 @@ sdist:
 clean:
 	rm -rf dist reports *.egg-info build logs .eggs .cache
 	find -name "*.pyc" -delete
-	find -name "*~" -delete

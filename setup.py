@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='cliff-adaptive-table',
-    version='0.1',
+    git_version=True,
 
     description='adaptive_table for cliff',
     long_description='an adaptive table formatter for cliff',
@@ -42,5 +42,4 @@ setup(
             'adaptive_table = cliff_adaptive_table.cliff_adaptive_table:AdaptiveTableFormatter',
         ],
     },
-    zip_safe=False,
 )
