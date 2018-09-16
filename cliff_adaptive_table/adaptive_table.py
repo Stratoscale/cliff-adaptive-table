@@ -195,26 +195,31 @@ class AdaptiveTable(object):
         return self._format_cell(data, 1, compact, max_str_length)
 
     def format(self, data):
-        width = self._terminal_size or self._get_terminal_size()[1]
+        def table_fits(table, terminal_width):
+            table_width = table.find('\n')
+            if table_width < 0:
+                table_width = len(table)
+            return table_width <= terminal_width
+        terminal_width = self._terminal_size or self._get_terminal_size()[1]
         table = self._format(data, compact=False, max_str_length=None)
-        if len(table.split('\n', 1)[0]) <= width:
+        if table_fits(table, terminal_width):
             return table
         table = self._format(data, compact=False, max_str_length=self._max_str_length)
-        if len(table.split('\n', 1)[0]) <= width:
+        if table_fits(table, terminal_width):
             return table
         table = self._format(data, compact=True, max_str_length=self._max_str_length)
-        if len(table.split('\n', 1)[0]) <= width:
+        if table_fits(table, terminal_width):
             return table
-        min_max_str_length = 10
-        max_max_str_length = self._max_str_length
-        max_str_length = (min_max_str_length + max_max_str_length) / 2
-        while min_max_str_length < max_str_length:
-            max_str_length = (min_max_str_length + max_max_str_length) / 2
+        lower_limit = 10
+        upper_limit = self._max_str_length
+        max_str_length = (lower_limit + upper_limit) / 2
+        while lower_limit < max_str_length:
+            max_str_length = (lower_limit + upper_limit) / 2
             table = self._format(data, compact=True, max_str_length=max_str_length)
-            if len(table.split('\n', 1)[0]) > width:
-                max_max_str_length = max_str_length
+            if table_fits(table, terminal_width):
+                lower_limit = max_str_length
             else:
-                min_max_str_length = max_str_length
+                upper_limit = max_str_length
         return table
 
     def _get_terminal_size(self):
