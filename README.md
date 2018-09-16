@@ -44,4 +44,3 @@ Valid boolean values are true, t, yes, y, false, f, no, and n (case-insensitive)
   - always - split cell values disregarding word limits. Might result in slightly shorter tables
   - never - turns off splitting of cell values, so the table looks like the _table_ formatter
 - **terminal-size=int** - force a terminal size instead of using the auto-detected value
-- **max-str-length=int** - maximum string length to split cell values to. If the table does not fit in the terminal, cliff-adaptive-table performs binary search on the optimal number of characters to split column values. This modifiers determines the limit of the binary search. Default: 100
