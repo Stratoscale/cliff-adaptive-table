@@ -29,7 +29,7 @@ class AdaptiveTable(object):
                  force_frames=False,
                  horizontal_lines=False,
                  split_words=SplitWords.EXCEPT_IDS,
-                 column_order='name,id'):
+                 column_order=['name', 'id']):
         self._terminal_size = terminal_size
         self._max_depth = max_depth
         self._force_frames = force_frames
