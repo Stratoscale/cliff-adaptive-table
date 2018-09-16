@@ -2,6 +2,14 @@ import modifier
 
 
 class FilterData(object):
+    MODIFIERS = {'grep': modifier.append_regex,
+                 'grep-v': modifier.append_regex,
+                 'grep-i': modifier.append_case_insensitive_regex,
+                 'grep-iv': modifier.append_case_insensitive_regex,
+                 'grep-vi': modifier.append_case_insensitive_regex,
+                 'columns': modifier.append_regex,
+                 'head': modifier.to_int,
+                 'tail': modifier.to_int}
 
     def _filter_data(self, data, greps, reverse_greps):
         def _matches(data, pattern):
@@ -37,16 +45,8 @@ class FilterData(object):
             return _filter_columns(data, column_patterns)
 
     def parse_modifiers(self, args):
-        MODIFIERS = {'grep': modifier.append_regex,
-                     'grep-v': modifier.append_regex,
-                     'grep-i': modifier.append_case_insensitive_regex,
-                     'grep-iv': modifier.append_case_insensitive_regex,
-                     'grep-vi': modifier.append_case_insensitive_regex,
-                     'columns': modifier.append_regex,
-                     'head': modifier.to_int,
-                     'tail': modifier.to_int}
 
-        self._modifiers, unrecognized_modifiers = modifier.parse_modifiers(MODIFIERS, args)
+        self._modifiers, unrecognized_modifiers = modifier.parse_modifiers(self.MODIFIERS, args)
         return unrecognized_modifiers
 
     def filter_data(self, data):
@@ -60,3 +60,6 @@ class FilterData(object):
             if 'tail' in self._modifiers:
                 data = data[-self._modifiers['tail']:]
         return data
+
+    def get_modifier_names(self):
+        return self.MODIFIERS.keys()

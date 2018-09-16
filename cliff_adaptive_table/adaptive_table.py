@@ -17,6 +17,11 @@ class SplitWords(object):
 
 
 class AdaptiveTable(object):
+    MODIFIERS = {'terminal-size': modifier.to_int,
+                 'force-frames': modifier.boolean,
+                 'horizontal-lines': modifier.boolean,
+                 'split-words': modifier.to_str,
+                 'column-order': modifier.csv}
 
     def __init__(self,
                  terminal_size=None,
@@ -34,16 +39,14 @@ class AdaptiveTable(object):
         self._set_key_sorter()
 
     def parse_modifiers(self, args):
-        MODIFIERS = {'terminal-size': modifier.to_int,
-                     'force-frames': modifier.boolean,
-                     'horizontal-lines': modifier.boolean,
-                     'split-words': modifier.to_str,
-                     'column-order': modifier.csv}
-        recognized, unrecognized = modifier.parse_modifiers(MODIFIERS, args)
+        recognized, unrecognized = modifier.parse_modifiers(self.MODIFIERS, args)
         for key, value in recognized.iteritems():
             setattr(self, '_' + key.replace('-', '_'), value)
         self._set_key_sorter()
         return unrecognized
+
+    def get_modifier_names(self):
+        return self.MODIFIERS.keys()
 
     def _set_key_sorter(self):
         if self._column_order:
