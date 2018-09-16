@@ -38,9 +38,9 @@ Valid boolean values are true, t, yes, y, false, f, no, and n (case-insensitive)
 - **column-order=csv** - a comma-seperated list of column names. Columns are sorted first by this list and the alphabetically. Default: name,id
 - **force-frames=bool** - force frames around all sub-objects
 - **horizontal-lines=bool** - force horizontal lines between each row
-- **split-words** - any of always, when-neccessary, or never:
-  - when-necessary - cell values are split between words, and only words longer than the cell width are split
-  - except-ids - same as _when-necessary_ except that UUIDs are never split. This is the default
+- **split-words** - any of always, except-ids, standard, or never:
+  - standard - cell values are split between words, and only words longer than the cell width are split
+  - except-ids - same as _standard_ except that UUIDs are never split. This is the default
   - always - split cell values disregarding word limits. Might result in slightly shorter tables
   - never - turns off splitting of cell values, so the table looks like the _table_ formatter
 - **terminal-size=int** - force a terminal size instead of using the auto-detected value
