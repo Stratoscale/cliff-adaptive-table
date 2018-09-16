@@ -3,6 +3,7 @@ import yaml
 import fcntl
 import struct
 import termios
+from string import hexdigits
 
 from adaptive_table_def import AdaptiveTableDef
 import modifier
@@ -16,6 +17,7 @@ class SplitWords(object):
 
 
 class AdaptiveTable(object):
+
     def __init__(self,
                  terminal_size=None,
                  max_depth=None,
@@ -92,17 +94,24 @@ class AdaptiveTable(object):
             line += word
             return line
 
+        def _is_uuid(value):
+            if len(value) in (32, 64) and not value.lstrip(hexdigits):
+                return True
+            if len(value) in (32, 36):
+                try:
+                    uuid.UUID(value)
+                    return True
+                except:
+                    pass
+            return False
+
         string = str(string)
         if not max_str_length:
             return string
         if self._split_words == SplitWords.ALWAYS:
             return '\n'.join(_simple_split(string, max_str_length))
-        if self._split_words == SplitWords.EXCEPT_IDS:
-            try:
-                uuid.UUID(string)
-                return string
-            except:
-                pass
+        if self._split_words == SplitWords.EXCEPT_IDS and _is_uuid(string):
+            return string
         lines = []
         current_line = ''
         for word in string.split():
