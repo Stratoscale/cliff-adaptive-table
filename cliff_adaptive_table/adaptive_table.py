@@ -72,6 +72,8 @@ class AdaptiveTable(object):
         lines = []
         prev_max_lines = 0
         for row_index, row in enumerate(data):
+            if not row:
+                continue
             max_lines = max(len(item) for item in row)
             sep = table_def.get_separator(row_index, max_lines, prev_max_lines)
             if sep:
@@ -80,7 +82,7 @@ class AdaptiveTable(object):
                 row = row + [''] * (len(widths) - len(row))
                 lines.append(table_def.line_format % tuple(self._get_line(item, index) for item in row))
             prev_max_lines = max_lines
-        if depth == 0 or self._force_frames:
+        if lines and (depth == 0 or self._force_frames):
             lines.append(table_def.get_end_separator())
         return '\n'.join(lines)
 
