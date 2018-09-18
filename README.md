@@ -44,4 +44,4 @@ Valid boolean values are true, t, yes, y, false, f, no, and n (case-insensitive)
   - except-ids - same as _standard_ except that UUIDs are never split. This is the default
   - always - split cell values disregarding word limits. Might result in slightly shorter tables
   - never - turns off splitting of cell values, so the table looks like the _table_ formatter
-- **terminal-size=int** - force a terminal size instead of using the auto-detected value
+- **width=int** - force a specific terminal width instead of using the auto-detected value
