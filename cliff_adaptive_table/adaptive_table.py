@@ -17,7 +17,7 @@ class SplitWords(object):
 
 
 class AdaptiveTable(object):
-    MODIFIERS = {'terminal-size': modifier.to_int,
+    MODIFIERS = {'width': modifier.to_int,
                  'force-frames': modifier.boolean,
                  'horizontal-lines': modifier.boolean,
                  'split-words': modifier.to_str,
@@ -25,14 +25,14 @@ class AdaptiveTable(object):
                  'split-table': modifier.boolean}
 
     def __init__(self,
-                 terminal_size=None,
+                 width=None,
                  split_table=None,
                  max_depth=None,
                  force_frames=False,
                  horizontal_lines=False,
                  split_words=SplitWords.EXCEPT_IDS,
                  column_order=['name', 'id']):
-        self._terminal_size = terminal_size or self._get_terminal_size()[1]
+        self._width = width or self._get_terminal_size()[1]
         self._split_table = split_table
         self._max_depth = max_depth
         self._force_frames = force_frames
@@ -80,7 +80,7 @@ class AdaptiveTable(object):
                     widths = all_widths[first_column:last_column]
                     indent = 0 if first_column == 0 else 2
                     table_def = AdaptiveTableDef(widths, depth, compact, self._force_frames, self._horizontal_lines, indent, headers[first_column:last_column])
-                    if table_def.total_width() <= self._terminal_size or first_column + 1 == last_column:
+                    if table_def.total_width() <= self._width or first_column + 1 == last_column:
                         data = [one_row[first_column:last_column] for one_row in all_data]
                         first_column = last_column
                         break
@@ -226,21 +226,21 @@ class AdaptiveTable(object):
         return self._format_cell(data, 1, compact, max_str_length)
 
     def format(self, data):
-        def table_fits(table, terminal_width):
+        def table_fits(table, width):
             table_width = table.find('\n')
             if table_width < 0:
                 table_width = len(table)
-            return table_width <= terminal_width
+            return table_width <= width
         # first try table without splitting strings
         table = self._format(data, compact=False, max_str_length=None)
-        if table_fits(table, self._terminal_width):
+        if table_fits(table, self._width):
             return table
         lower_limit = 10
         upper_limit = 100
         # find upper limit to string length
         while True:
             table = self._format(data, compact=False, max_str_length=upper_limit)
-            if table_fits(table, self._terminal_width):
+            if table_fits(table, self._width):
                 lower_limit = upper_limit
                 upper_limit *= 2
             else:
@@ -250,13 +250,13 @@ class AdaptiveTable(object):
         while lower_limit < max_str_length:
             max_str_length = (lower_limit + upper_limit) / 2
             table = self._format(data, compact=True, max_str_length=max_str_length)
-            if table_fits(table, self._terminal_width):
+            if table_fits(table, self._width):
                 lower_limit = max_str_length
             else:
                 upper_limit = max_str_length
         # try non-compact table, it often fits
         non_compact_table = self._format(data, compact=False, max_str_length=max_str_length)
-        if table_fits(non_compact_table, self._terminal_width):
+        if table_fits(non_compact_table, self._width):
             return non_compact_table
         return table
 
