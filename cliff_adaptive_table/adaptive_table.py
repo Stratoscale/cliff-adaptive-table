@@ -21,16 +21,19 @@ class AdaptiveTable(object):
                  'force-frames': modifier.boolean,
                  'horizontal-lines': modifier.boolean,
                  'split-words': modifier.to_str,
-                 'column-order': modifier.csv}
+                 'column-order': modifier.csv,
+                 'split-table': modifier.boolean}
 
     def __init__(self,
                  terminal_size=None,
+                 split_table=None,
                  max_depth=None,
                  force_frames=False,
                  horizontal_lines=False,
                  split_words=SplitWords.EXCEPT_IDS,
                  column_order=['name', 'id']):
-        self._terminal_size = terminal_size
+        self._terminal_size = terminal_size or self._get_terminal_size()[1]
+        self._split_table = split_table
         self._max_depth = max_depth
         self._force_frames = force_frames
         self._split_words = split_words
@@ -58,32 +61,49 @@ class AdaptiveTable(object):
     def _format_table(self, headers, raw_data, depth, compact):
         if not raw_data:
             return str(raw_data)
-        widths = [0] * max(len(datum) for datum in raw_data)
-        data = []
+        all_widths = [0] * max(len(datum) for datum in raw_data)
+        all_data = []
         if headers:
             raw_data = [headers] + raw_data
         for raw_row in raw_data:
             row = [str(item).split('\n') for item in raw_row]
             for index, item in enumerate(row):
-                widths[index] = max(widths[index], max(len(line) for line in item))
-            data.append(row)
-        table_def = AdaptiveTableDef(widths, depth, compact, self._force_frames, self._horizontal_lines, headers)
+                all_widths[index] = max(all_widths[index], max(len(line) for line in item))
+            all_data.append(row)
 
         lines = []
-        prev_max_lines = 0
-        for row_index, row in enumerate(data):
-            if not row:
-                continue
-            max_lines = max(len(item) for item in row)
-            sep = table_def.get_separator(row_index, max_lines, prev_max_lines)
-            if sep:
-                lines.append(sep)
-            for index in xrange(max_lines):
-                row = row + [''] * (len(widths) - len(row))
-                lines.append(table_def.line_format % tuple(self._get_line(item, index) for item in row))
-            prev_max_lines = max_lines
-        if lines and (depth == 0 or self._force_frames):
-            lines.append(table_def.get_end_separator())
+        first_column = 0
+        while headers is None or first_column < len(headers):
+            if depth == 0 and headers and self._split_table:
+                last_column = len(headers) + 1
+                while last_column > first_column:
+                    widths = all_widths[first_column:last_column]
+                    indent = 0 if first_column == 0 else 2
+                    table_def = AdaptiveTableDef(widths, depth, compact, self._force_frames, self._horizontal_lines, indent, headers[first_column:last_column])
+                    if table_def.total_width() <= self._terminal_size or first_column + 1 == last_column:
+                        data = [one_row[first_column:last_column] for one_row in all_data]
+                        first_column = last_column
+                        break
+                    last_column -= 1
+            else:
+                data = all_data
+                widths = all_widths
+                table_def = AdaptiveTableDef(widths, depth, compact, self._force_frames, self._horizontal_lines, 0, headers)
+
+            prev_max_lines = 0
+            for row_index, row in enumerate(data):
+                max_lines = max(len(item) for item in row)
+                sep = table_def.get_separator(row_index, max_lines, prev_max_lines)
+                if sep:
+                    lines.append(sep)
+                for index in xrange(max_lines):
+                    row = row + [''] * (len(widths) - len(row))
+                    lines.append(table_def.line_format % tuple(self._get_line(item, index) for item in row))
+                prev_max_lines = max_lines
+            if depth == 0 or self._force_frames:
+                lines.append(table_def.get_end_separator())
+            if not headers or depth > 0 or not self._split_table:
+                break
         return '\n'.join(lines)
 
     def _get_line(self, lines, index):
@@ -211,17 +231,16 @@ class AdaptiveTable(object):
             if table_width < 0:
                 table_width = len(table)
             return table_width <= terminal_width
-        terminal_width = self._terminal_size or self._get_terminal_size()[1]
         # first try table without splitting strings
         table = self._format(data, compact=False, max_str_length=None)
-        if table_fits(table, terminal_width):
+        if table_fits(table, self._terminal_width):
             return table
         lower_limit = 10
         upper_limit = 100
         # find upper limit to string length
         while True:
             table = self._format(data, compact=False, max_str_length=upper_limit)
-            if table_fits(table, terminal_width):
+            if table_fits(table, self._terminal_width):
                 lower_limit = upper_limit
                 upper_limit *= 2
             else:
@@ -231,13 +250,13 @@ class AdaptiveTable(object):
         while lower_limit < max_str_length:
             max_str_length = (lower_limit + upper_limit) / 2
             table = self._format(data, compact=True, max_str_length=max_str_length)
-            if table_fits(table, terminal_width):
+            if table_fits(table, self._terminal_width):
                 lower_limit = max_str_length
             else:
                 upper_limit = max_str_length
         # try non-compact table, it often fits
         non_compact_table = self._format(data, compact=False, max_str_length=max_str_length)
-        if table_fits(non_compact_table, terminal_width):
+        if table_fits(non_compact_table, self._terminal_width):
             return non_compact_table
         return table
 

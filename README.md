@@ -35,6 +35,7 @@ All modifiers are of the form name=value. Supported modifiers are:
 
 ## Display Modifiers
 Valid boolean values are true, t, yes, y, false, f, no, and n (case-insensitive)
+- **split-table=bool** - allow table to be split to multiple tables that each have some of the columns
 - **column-order=csv** - a comma-seperated list of column names. Columns are sorted first by this list and then alphabetically. Default: name,id
 - **force-frames=bool** - force frames around all sub-objects
 - **horizontal-lines=bool** - force horizontal lines between each row
