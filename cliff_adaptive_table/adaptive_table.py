@@ -268,10 +268,15 @@ class AdaptiveTable(object):
         return table
 
     def _get_terminal_size(self):
-        def ioctl_GWINSZ(fd):
-            try:
-                return struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
-            except:
-                pass
-        cr = ioctl_GWINSZ(0) or ioctl_GWINSZ(1) or ioctl_GWINSZ(2)
-        return cr
+        try:
+            def ioctl_GWINSZ(fd):
+                try:
+                    return struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
+                except:
+                    pass
+            cr = ioctl_GWINSZ(0) or ioctl_GWINSZ(1) or ioctl_GWINSZ(2)
+            if cr is None:
+                cr = (1000, 1000)
+            return cr
+        except:
+            return 1000, 1000
