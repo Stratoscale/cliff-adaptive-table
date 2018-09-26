@@ -61,15 +61,7 @@ class AdaptiveTable(object):
     def _format_table(self, headers, raw_data, depth, compact):
         if not raw_data:
             return str(raw_data)
-        all_widths = [0] * max(len(datum) for datum in raw_data)
-        all_data = []
-        if headers:
-            raw_data = [headers] + raw_data
-        for raw_row in raw_data:
-            row = [str(item).split('\n') for item in raw_row]
-            for index, item in enumerate(row):
-                all_widths[index] = max(all_widths[index], max(len(line) for line in item))
-            all_data.append(row)
+        all_data, all_widths = self._prepare_data_for_formatting(headers, raw_data)
 
         lines = []
         first_column = 0
@@ -90,21 +82,36 @@ class AdaptiveTable(object):
                 widths = all_widths
                 table_def = AdaptiveTableDef(widths, depth, compact, self._force_frames, self._horizontal_lines, 0, headers)
 
-            prev_max_lines = 0
-            for row_index, row in enumerate(data):
-                max_lines = max(len(item) for item in row)
-                sep = table_def.get_separator(row_index, max_lines, prev_max_lines)
-                if sep:
-                    lines.append(sep)
-                for index in xrange(max_lines):
-                    row = row + [''] * (len(widths) - len(row))
-                    lines.append(table_def.line_format % tuple(self._get_line(item, index) for item in row))
-                prev_max_lines = max_lines
-            if depth == 0 or self._force_frames:
-                lines.append(table_def.get_end_separator())
+            self._format_columns(table_def, widths, depth, data, lines)
             if not headers or depth > 0 or not self._split_table:
                 break
         return '\n'.join(lines)
+
+    def _prepare_data_for_formatting(self, headers, raw_data):
+        all_widths = [0] * max(len(datum) for datum in raw_data)
+        all_data = []
+        if headers:
+            raw_data = [headers] + raw_data
+        for raw_row in raw_data:
+            row = [str(item).split('\n') for item in raw_row]
+            for index, item in enumerate(row):
+                all_widths[index] = max(all_widths[index], max(len(line) for line in item))
+            all_data.append(row)
+        return all_data, all_widths
+
+    def _format_columns(self, table_def, widths, depth, data, lines):
+        prev_max_lines = 0
+        for row_index, row in enumerate(data):
+            max_lines = max(len(item) for item in row)
+            sep = table_def.get_separator(row_index, max_lines, prev_max_lines)
+            if sep:
+                lines.append(sep)
+            for index in xrange(max_lines):
+                row = row + [''] * (len(widths) - len(row))
+                lines.append(table_def.line_format % tuple(self._get_line(item, index) for item in row))
+            prev_max_lines = max_lines
+        if depth == 0 or self._force_frames:
+            lines.append(table_def.get_end_separator())
 
     def _get_line(self, lines, index):
         return lines[index] if index < len(lines) else ''
