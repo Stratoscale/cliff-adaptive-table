@@ -53,8 +53,8 @@ class AdaptiveTable(object):
 
     def _set_key_sorter(self):
         if self._column_order:
-            self._column_order = {key.lower(): index - len(self._column_order) for index, key in enumerate(self._column_order)}
-            self._key_sorter = lambda item: [self._column_order.get(str(item).lower(), 0), item]
+            column_value = {key.lower(): index - len(self._column_order) for index, key in enumerate(self._column_order)}
+            self._key_sorter = lambda item: [column_value.get(str(item).lower(), 0), item]
         else:
             self._key_sorter = lambda item: item
 
