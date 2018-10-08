@@ -36,7 +36,7 @@ All modifiers are of the form name=value. Supported modifiers are:
 ## Display Modifiers
 Valid boolean values are `true`, `t`, `yes`, `y`, `false`, `f`, `no`, and `n` (case-insensitive).
 - **split-table=bool** - Allow table to be split to multiple tables that each have some of the columns. Default: false.
-- **column-order=csv** - A comma-seperated list of column names. Columns are sorted first by this list and then alphabetically. Default: `name`, `id`.
+- **column-order=csv** - A comma-seperated list of column names. Columns are sorted first by this list and then alphabetically. Default: `name`, `id`, `status`, `state`.
 - **force-frames=bool** - Force frames around all sub-objects. Default: false.
 - **horizontal-lines=bool** - Force horizontal lines between each row. Horizontal lines are normally only drawn if either the row above or below is split into multiple lines. Default: false.
 - **split-words** - Any of `always`, `except-ids`, `standard`, or `never`:

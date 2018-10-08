@@ -23,6 +23,7 @@ class AdaptiveTable(object):
                  'split-words': modifier.to_str,
                  'column-order': modifier.csv,
                  'split-table': modifier.boolean}
+    DEFAULT_COLUMN_ORDER = ['name', 'id', 'status', 'state']
 
     def __init__(self,
                  width=None,
@@ -31,14 +32,14 @@ class AdaptiveTable(object):
                  force_frames=False,
                  horizontal_lines=False,
                  split_words=SplitWords.EXCEPT_IDS,
-                 column_order=['name', 'id']):
+                 column_order=DEFAULT_COLUMN_ORDER):
         self._width = width or self._get_terminal_size()[1]
         self._split_table = split_table
         self._max_depth = max_depth
         self._force_frames = force_frames
         self._split_words = split_words
         self._horizontal_lines = horizontal_lines
-        self._column_order = column_order or ['name', 'id']
+        self._column_order = column_order or self.DEFAULT_COLUMN_ORDER
         self._set_key_sorter()
 
     def parse_modifiers(self, args):
