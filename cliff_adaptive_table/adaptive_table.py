@@ -182,8 +182,9 @@ class AdaptiveTable(object):
         if isinstance(data, dict):
             if not data:
                 return {}
+            keys = sorted(data.iterkeys(), key=self._key_sorter)
             table = [[self._split_string(key, max_str_length),
-                      self._format_cell(value, depth + 1, compact, max_str_length)] for key, value in sorted(data.iteritems())]
+                      self._format_cell(data[key], depth + 1, compact, max_str_length)] for key in keys]
             return self._format_table(None, table, depth, compact)
 
         if isinstance(data, (list, tuple)):
@@ -210,7 +211,8 @@ class AdaptiveTable(object):
         if isinstance(data, (list, tuple)) and len(data) == 1:
             data = data[0]
         if isinstance(data, dict):
-            table = [[key, self._format_cell(value, 1, compact, max_str_length)] for key, value in sorted(data.iteritems())]
+            keys = sorted(data.iterkeys(), key=self._key_sorter)
+            table = [[key, self._format_cell(data[key], 1, compact, max_str_length)] for key in keys]
             return self._format_table(None, table, 0, compact)
 
         if isinstance(data, (list, tuple)):
