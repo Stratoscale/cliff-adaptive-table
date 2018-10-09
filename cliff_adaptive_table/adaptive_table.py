@@ -23,7 +23,7 @@ class AdaptiveTable(object):
                  'split-words': modifier.to_str,
                  'column-order': modifier.csv,
                  'split-table': modifier.boolean}
-    DEFAULT_COLUMN_ORDER = ['name', 'id', 'status', 'state']
+    DEFAULT_COLUMN_ORDER = ['id', 'name', 'status', 'state']
 
     def __init__(self,
                  width=None,
