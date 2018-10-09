@@ -139,7 +139,7 @@ class AdaptiveTable(object):
             return False
 
         string = str(string)
-        if not max_str_length:
+        if not max_str_length or self._split_words == SplitWords.NEVER:
             return string
         if self._split_words == SplitWords.ALWAYS:
             return '\n'.join(_simple_split(string, max_str_length))
