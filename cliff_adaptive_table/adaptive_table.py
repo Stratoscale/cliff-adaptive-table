@@ -1,5 +1,5 @@
 import uuid
-import yaml
+import json
 import fcntl
 import struct
 import termios
@@ -178,7 +178,7 @@ class AdaptiveTable(object):
         if isinstance(data, (str, unicode)):
             return self._split_string(data, max_str_length)
         if self._max_depth is not None and depth >= self._max_depth:
-            return yaml.dumps(data, indent=1 if compact else 2, sort_keys=True)
+            return json.dumps(data, sort_keys=True)
         if isinstance(data, dict):
             if not data:
                 return {}
@@ -268,6 +268,11 @@ class AdaptiveTable(object):
         non_compact_table = self._format(data, compact=False, max_str_length=max_str_length)
         if table_fits(non_compact_table, self._width):
             return non_compact_table
+        if not table_fits(table, self._width):
+            # give up, just make sure each row is printed in exactly one line
+            self._max_depth = 1
+            self._split_words = SplitWords.NEVER
+            table = self._format(data, compact=False, max_str_length=max_str_length)
         return table
 
     def _get_terminal_size(self):
