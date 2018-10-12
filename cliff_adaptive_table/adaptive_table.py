@@ -1,3 +1,4 @@
+import re
 import uuid
 import json
 import fcntl
@@ -24,6 +25,7 @@ class AdaptiveTable(object):
                  'column-order': modifier.csv,
                  'split-table': modifier.boolean}
     DEFAULT_COLUMN_ORDER = ['id', 'name', 'status', 'state']
+    _IP_PATTERN = re.compile('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$')
 
     def __init__(self,
                  width=None,
@@ -127,7 +129,7 @@ class AdaptiveTable(object):
             line += word
             return line
 
-        def _is_uuid(value):
+        def _should_not_be_split(value):
             if len(value) in (32, 64) and not value.lstrip(hexdigits):
                 return True
             if len(value) in (32, 36):
@@ -136,14 +138,14 @@ class AdaptiveTable(object):
                     return True
                 except:
                     pass
-            return False
+            return bool(self._IP_PATTERN.match(value))
 
         string = str(string)
         if not max_str_length or self._split_words == SplitWords.NEVER:
             return string
         if self._split_words == SplitWords.ALWAYS:
             return '\n'.join(_simple_split(string, max_str_length))
-        if self._split_words == SplitWords.EXCEPT_IDS and _is_uuid(string):
+        if self._split_words == SplitWords.EXCEPT_IDS and _should_not_be_split(string):
             return string
         lines = []
         current_line = ''
