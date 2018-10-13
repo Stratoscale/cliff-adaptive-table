@@ -176,6 +176,13 @@ class AdaptiveTable(object):
             lines.append(current_line)
         return '\n'.join(lines)
 
+    def _get_keys_of_a_list_of_dicts(self, data):
+        keys = set()
+        for item in data:
+            if isinstance(item, dict):
+                keys.update(item.iterkeys())
+        return sorted(keys, key=self._key_sorter)
+
     def _format_cell(self, data, depth, compact, max_str_length):
         if isinstance(data, (str, unicode)):
             return self._split_string(data, max_str_length)
@@ -192,11 +199,7 @@ class AdaptiveTable(object):
         if isinstance(data, (list, tuple)):
             table = []
             headers = []
-            keys = set()
-            for item in data:
-                if isinstance(item, dict):
-                    keys.update(item.iterkeys())
-            keys = sorted(keys, key=self._key_sorter)
+            keys = self._get_keys_of_a_list_of_dicts(data)
             headers = [self._split_string(key, max_str_length) for key in keys]
             for item in data:
                 if isinstance(item, dict):
@@ -220,11 +223,7 @@ class AdaptiveTable(object):
         if isinstance(data, (list, tuple)):
             table = []
             headers = []
-            keys = set()
-            for item in data:
-                if isinstance(item, dict):
-                    keys.update(item.iterkeys())
-            keys = sorted(keys, key=self._key_sorter)
+            keys = self._get_keys_of_a_list_of_dicts(data)
             headers = [self._split_string(key, max_str_length) for key in keys]
             for item in data:
                 if isinstance(item, dict):
