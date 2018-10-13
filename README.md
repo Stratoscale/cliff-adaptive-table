@@ -35,6 +35,7 @@ All modifiers are of the form name=value. Supported modifiers are:
 
 ## Display Modifiers
 Valid boolean values are `true`, `t`, `yes`, `y`, `false`, `f`, `no`, and `n` (case-insensitive).
+- **color=bool** - Allow some columns to be colored according to the value (note: this only applies to the top level values, not to values in sub-tables). Default: true.
 - **split-table=bool** - Allow table to be split to multiple tables that each have some of the columns. Default: false.
 - **column-order=csv** - A comma-seperated list of column names. Columns are sorted first by this list and then alphabetically. Default: `name`, `id`, `status`, `state`.
 - **force-frames=bool** - Force frames around all sub-objects. Default: false.

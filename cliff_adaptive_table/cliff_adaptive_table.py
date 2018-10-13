@@ -5,13 +5,31 @@ from filter_data import FilterData
 
 
 class AdaptiveTableFormatter(ListFormatter, SingleFormatter):
+    COLOR_GOOD = '\033[32m'  # green
+    COLOR_BAD = '\033[31m'  # red
+    COLOR_NEUTRAL = '\033[35m'  # magenta
+    OUTPUT_COLUMN_COLORS = {
+        'status': {
+            'active': COLOR_GOOD,
+            'ready': COLOR_GOOD,
+            'error': COLOR_BAD,
+            'migrating': COLOR_NEUTRAL,
+        },
+        'state': {  # for nodes
+            'active': COLOR_GOOD,
+            'down': COLOR_BAD,
+            'up': COLOR_GOOD,
+            'in_progress': COLOR_NEUTRAL,
+            'in_maintenance': COLOR_NEUTRAL,
+        }
+    }
 
     def add_argument_group(self, parser):
         group = parser.add_argument_group('adaptive table formatter')
-        group.add_argument('-m', '--modifiers', nargs='*', help='modifiers')
+        group.add_argument('-m', '--modifiers', nargs='*', help='Modifiers. See cliff-adaptive-table documentation for details.')
 
     def _emit(self, data, stdout, parsed_args):
-        adaptive_table = AdaptiveTable()
+        adaptive_table = AdaptiveTable(color_dict=self.OUTPUT_COLUMN_COLORS)
         filter_data = FilterData()
         non_table_modifiers = adaptive_table.parse_modifiers(parsed_args.modifiers)
         invalid_modifiers = filter_data.parse_modifiers(non_table_modifiers)
