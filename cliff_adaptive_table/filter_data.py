@@ -8,6 +8,7 @@ class FilterData(object):
                  'grep-iv': modifier.append_case_insensitive_regex,
                  'grep-vi': modifier.append_case_insensitive_regex,
                  'columns': modifier.append_case_insensitive_regex,
+                 'columns-v': modifier.append_case_insensitive_regex,
                  'head': modifier.to_int,
                  'tail': modifier.to_int}
 
@@ -31,18 +32,20 @@ class FilterData(object):
             return [value for value in data if _filter(value, greps, reverse_greps)]
         return _filter(value, greps, reverse_greps)
 
-    def _filter_columns(self, data, column_patterns):
-        def _filter_columns(data, column_patterns):
+    def _filter_columns(self, data, column_patterns, column_anti_patterns):
+        def _filter_columns(data, column_patterns, column_anti_patterns):
             if isinstance(data, dict):
-                data = {key: value for key, value in data.iteritems() if any(pattern.search(key) for pattern in column_patterns)}
+                data = {key: value for key, value in data.iteritems() if
+                        (not column_patterns or any(pattern.search(key) for pattern in column_patterns)) and
+                        (not column_anti_patterns or not any(pattern.search(key) for pattern in column_anti_patterns))}
             return data
 
-        if not column_patterns:
+        if not column_patterns and not column_anti_patterns:
             return data
         if isinstance(data, (list, tuple)):
-            return [_filter_columns(value, column_patterns) for value in data]
+            return [_filter_columns(value, column_patterns, column_anti_patterns) for value in data]
         else:
-            return _filter_columns(data, column_patterns)
+            return _filter_columns(data, column_patterns, column_anti_patterns)
 
     def parse_modifiers(self, args):
 
@@ -53,7 +56,7 @@ class FilterData(object):
         greps = self._modifiers.get('grep', []) + self._modifiers.get('grep-i', [])
         reverse_greps = self._modifiers.get('grep-v', []) + self._modifiers.get('grep-vi', []) + self._modifiers.get('grep-iv', [])
         data = self._filter_data(data, greps, reverse_greps)
-        data = self._filter_columns(data, self._modifiers.get('columns'))
+        data = self._filter_columns(data, self._modifiers.get('columns', []), self._modifiers.get('columns-v', []))
         if isinstance(data, list):
             if 'head' in self._modifiers:
                 data = data[:self._modifiers['head']]

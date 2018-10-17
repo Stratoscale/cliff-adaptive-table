@@ -26,14 +26,15 @@ All modifiers are of the form name=value. Supported modifiers are:
 - **grep-i=pattern**: Same as _grep_, but matching is case-insensitive.
 - **grep-v=pattern**: Skip rows that have a value that matches pattern. Examples:
   - grep-v=name - Only print rows where none of the values matches 'name'.
-  - grep-v=name|nombre - only print rows where none of the values matches either 'name' or 'nombre'.
-  - grep-v=name grep-v=nombre - print all rows _except_ rows that have a value that matches 'name' _and_ a value that matches 'nombre'.
+  - grep-v=name|nombre - Only print rows where none of the values matches either 'name' or 'nombre'.
+  - grep-v=name grep-v=nombre - Print all rows _except_ rows that have a value that matches 'name' _and_ a value that matches 'nombre'.
 - **grep-iv=pattern**, **grep-vi=pattern** - same as _grep-v_, but matching is case-insensitive.
 - **head=_n_** - Only print first _n_ rows.
 - **tail=_n_** - Only print last _n_ rows. Note that _tail_ is processed after _head_ regardless of their order in the command. Thus, if the entire table had 20 rows, _head=10_ _tail=5_ means that rows 6-10 are printed (where row number starts at 1).
-- **columns=pattern** - Only print columns whose name match _pattern_. If repeated, all columns matching any of the patterns will be printed. Thus, _columns=id|name_ is the same as _columns=id_ _columns=name_ (in contradistiction to _grep*_). Note that the _columns_ modifier is processed after the _grep*_ modifiers, so the matched values might not be printed.
+- **columns=pattern** - Only print columns whose name match _pattern_ (matching is case-insensitive). If repeated, all columns matching any of the patterns will be printed. Thus, _columns=id|name_ is the same as _columns=id_ _columns=name_ (in contradistiction to _grep*_). Note that the _columns_ modifier is processed after the _grep*_ modifiers, so the matched values might not be printed.
+- **columns-v=pattern** - Do not print columns whose name match _pattern_ (matching is case-insensitive). If repeated, all columns matching any of the patterns will be ignored. Thus, _columns-v=id|name_ is the same as _columns-v=id_ _columns-v=name_ (in contradistiction to _grep*_). Note that the _columns-v_ modifier is processed after the _grep*_ modifiers, so the matched values might not be printed.
 
-These modifiers are processed in the following order: _grep*_, _head_, _tail_ and finally _columns_.
+These modifiers are processed in the following order: _grep*_, _head_, _tail_ and finally _columns_ and _columns-v_.
 
 ## Display Modifiers
 Valid boolean values are `true`, `t`, `yes`, `y`, `false`, `f`, `no`, and `n` (case-insensitive).
