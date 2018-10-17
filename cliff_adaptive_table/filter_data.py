@@ -7,7 +7,7 @@ class FilterData(object):
                  'grep-i': modifier.append_case_insensitive_regex,
                  'grep-iv': modifier.append_case_insensitive_regex,
                  'grep-vi': modifier.append_case_insensitive_regex,
-                 'columns': modifier.append_regex,
+                 'columns': modifier.append_case_insensitive_regex,
                  'head': modifier.to_int,
                  'tail': modifier.to_int}
 
