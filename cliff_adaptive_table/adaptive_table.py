@@ -62,13 +62,13 @@ class AdaptiveTable(object):
     def _set_key_sorter(self):
         if self._column_order:
             column_value = {key.lower(): index - len(self._column_order) for index, key in enumerate(self._column_order)}
-            self._key_sorter = lambda item: [column_value.get(str(item).lower(), 0), item]
+            self._key_sorter = lambda item: [column_value.get(unicode(item).lower(), 0), item]
         else:
             self._key_sorter = lambda item: item
 
     def _format_table(self, headers, raw_data, all_colors, depth, compact):
         if not raw_data:
-            return str(raw_data)
+            return unicode(raw_data)
         all_data, all_widths = self._prepare_data_for_formatting(headers, raw_data)
 
         lines = []
@@ -109,7 +109,7 @@ class AdaptiveTable(object):
         if headers:
             raw_data = [headers] + raw_data
         for raw_row in raw_data:
-            row = [str(item).split('\n') for item in raw_row]
+            row = [unicode(item).split('\n') for item in raw_row]
             for index, item in enumerate(row):
                 all_widths[index] = max(all_widths[index], max(len(line) for line in item))
             all_data.append(row)
@@ -171,7 +171,7 @@ class AdaptiveTable(object):
                     pass
             return bool(self._IP_PATTERN.match(value))
 
-        string = str(string)
+        string = unicode(string)
         if not max_str_length or self._split_words == SplitWords.NEVER:
             return string
         if self._split_words == SplitWords.ALWAYS:
@@ -241,7 +241,7 @@ class AdaptiveTable(object):
                 non_dicts_table = [[self._format_cell(value, depth + 1, compact, max_str_length)] for value in non_dicts]
                 return self._format_table(None, non_dicts_table, None, depth, compact)
             return formatted
-        return str(data)
+        return unicode(data)
 
     def _format(self, data, colors, compact, max_str_length):
         if isinstance(data, dict):
