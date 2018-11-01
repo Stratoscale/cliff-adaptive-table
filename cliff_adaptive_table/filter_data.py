@@ -33,7 +33,7 @@ class FilterData(object):
         return _filter(value, greps, reverse_greps)
 
     def _filter_columns(self, data, column_patterns, column_anti_patterns):
-        def _filter_columns(data, column_patterns, column_anti_patterns):
+        def _filter_columns_in_dict(data, column_patterns, column_anti_patterns):
             if isinstance(data, dict):
                 data = {key: value for key, value in data.iteritems() if
                         (not column_patterns or any(pattern.search(key) for pattern in column_patterns)) and
@@ -43,9 +43,9 @@ class FilterData(object):
         if not column_patterns and not column_anti_patterns:
             return data
         if isinstance(data, (list, tuple)):
-            return [_filter_columns(value, column_patterns, column_anti_patterns) for value in data]
+            return [_filter_columns_in_dict(value, column_patterns, column_anti_patterns) for value in data]
         else:
-            return _filter_columns(data, column_patterns, column_anti_patterns)
+            return _filter_columns_in_dict(data, column_patterns, column_anti_patterns)
 
     def parse_modifiers(self, args):
 
