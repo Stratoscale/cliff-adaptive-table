@@ -7,6 +7,7 @@ from filter_data import FilterData
 class AdaptiveTableFormatter(ListFormatter, SingleFormatter):
     COLOR_GOOD = '\033[32m'  # green
     COLOR_BAD = '\033[31m'  # red
+    COLOR_ACTIVE = '\033[33;1m'  # yellow
     COLOR_NEUTRAL = '\033[35m'  # magenta
     OUTPUT_COLUMN_COLORS = {
         'status': {
@@ -14,6 +15,14 @@ class AdaptiveTableFormatter(ListFormatter, SingleFormatter):
             'ready': COLOR_GOOD,
             'error': COLOR_BAD,
             'migrating': COLOR_NEUTRAL,
+            # for autoscaling groups
+            'deleting': COLOR_ACTIVE,
+            # for hot-upgrade
+            'Preparing': COLOR_NEUTRAL,
+            'Pending': COLOR_NEUTRAL,
+            'Ready to Install': COLOR_NEUTRAL,
+            'Installing': COLOR_ACTIVE,
+            'Done': COLOR_GOOD,
         },
         'state': {  # for nodes
             'active': COLOR_GOOD,
