@@ -19,14 +19,14 @@ class SplitWords(object):
 
 
 class AdaptiveTable(object):
-    MODIFIERS = {'width': modifier.to_int,
-                 'force-frames': modifier.boolean,
-                 'horizontal-lines': modifier.boolean,
-                 'split-words': modifier.to_str,
-                 'column-order': modifier.csv,
-                 'split-table': modifier.boolean,
-                 'color': modifier.boolean}
-    DEFAULT_COLUMN_ORDER = ['id', 'name', 'status', 'state']
+    _MODIFIERS = {'width': modifier.to_int,
+                  'force-frames': modifier.boolean,
+                  'horizontal-lines': modifier.boolean,
+                  'split-words': modifier.to_str,
+                  'column-order': modifier.csv,
+                  'split-table': modifier.boolean,
+                  'color': modifier.boolean}
+    _DEFAULT_COLUMN_ORDER = ['id', 'name', 'status', 'state']
     _IP_PATTERN = re.compile('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$')
     _TTL = 1.0  # maximum time to try to optimize the table
 
@@ -39,7 +39,7 @@ class AdaptiveTable(object):
                  force_frames=False,
                  horizontal_lines=False,
                  split_words=SplitWords.EXCEPT_IDS,
-                 column_order=DEFAULT_COLUMN_ORDER,
+                 column_order=_DEFAULT_COLUMN_ORDER,
                  ttl=_TTL):
         self._color_dict = color_dict or {}
         self._color = color
@@ -49,7 +49,7 @@ class AdaptiveTable(object):
         self._force_frames = force_frames
         self._split_words = split_words
         self._horizontal_lines = horizontal_lines
-        self._column_order = column_order or self.DEFAULT_COLUMN_ORDER
+        self._column_order = column_order or self._DEFAULT_COLUMN_ORDER
         self._set_key_sorter()
         if ttl is None:
             self._timeout = None
@@ -57,14 +57,14 @@ class AdaptiveTable(object):
             self._timeout = time.time() + ttl
 
     def parse_modifiers(self, args):
-        recognized, unrecognized = modifier.parse_modifiers(self.MODIFIERS, args)
+        recognized, unrecognized = modifier.parse_modifiers(self._MODIFIERS, args)
         for key, value in recognized.iteritems():
             setattr(self, '_' + key.replace('-', '_'), value)
         self._set_key_sorter()
         return unrecognized
 
     def get_modifier_names(self):
-        return self.MODIFIERS.keys()
+        return self._MODIFIERS.keys()
 
     def _set_key_sorter(self):
         if self._column_order:
