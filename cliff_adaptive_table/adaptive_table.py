@@ -1,4 +1,5 @@
 import re
+import time
 import uuid
 import json
 import fcntl
@@ -27,6 +28,7 @@ class AdaptiveTable(object):
                  'color': modifier.boolean}
     DEFAULT_COLUMN_ORDER = ['id', 'name', 'status', 'state']
     _IP_PATTERN = re.compile('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$')
+    _TTL = 1.0  # maximum time to try to optimize the table
 
     def __init__(self,
                  color_dict=None,
@@ -37,7 +39,8 @@ class AdaptiveTable(object):
                  force_frames=False,
                  horizontal_lines=False,
                  split_words=SplitWords.EXCEPT_IDS,
-                 column_order=DEFAULT_COLUMN_ORDER):
+                 column_order=DEFAULT_COLUMN_ORDER,
+                 ttl=_TTL):
         self._color_dict = color_dict or {}
         self._color = color
         self._width = width or self._get_terminal_size()[1]
@@ -48,6 +51,10 @@ class AdaptiveTable(object):
         self._horizontal_lines = horizontal_lines
         self._column_order = column_order or self.DEFAULT_COLUMN_ORDER
         self._set_key_sorter()
+        if ttl is None:
+            self._timeout = None
+        else:
+            self._timeout = time.time() + ttl
 
     def parse_modifiers(self, args):
         recognized, unrecognized = modifier.parse_modifiers(self.MODIFIERS, args)
@@ -215,6 +222,8 @@ class AdaptiveTable(object):
         return sorted(keys, key=self._key_sorter)
 
     def _format_cell(self, data, depth, compact, max_str_length):
+        if self._timeout and time.time() > self._timeout:
+            raise RuntimeError
         if isinstance(data, (str, unicode)):
             return self._split_string(data, max_str_length)
         if self._max_depth is not None and depth >= self._max_depth:
@@ -285,15 +294,12 @@ class AdaptiveTable(object):
             return [[]] + [_get_dict_colors(keys, item) for item in data]
         return None
 
-    def format(self, data):
+    def _adaptive_format(self, data, colors):
         def table_fits(table, width):
             table_width = table.find('\n')
             if table_width < 0:
                 table_width = len(table)
             return table_width <= width
-        if isinstance(data, (list, tuple)) and len(data) == 1:
-            data = data[0]
-        colors = self._get_data_colors(data)
         # first try table without splitting strings
         table = self._format(data, colors, compact=False, max_str_length=None)
         if table_fits(table, self._width):
@@ -325,8 +331,21 @@ class AdaptiveTable(object):
             # give up, just make sure each row is printed in exactly one line
             self._max_depth = 1
             self._split_words = SplitWords.NEVER
-            table = self._format(data, colors, compact=False, max_str_length=max_str_length)
+            table = self._format(data, colors, compact=False, max_str_length=None)
         return table
+
+    def format(self, data):
+        if isinstance(data, (list, tuple)) and len(data) == 1:
+            data = data[0]
+        colors = self._get_data_colors(data)
+        try:
+            return self._adaptive_format(data, colors)
+        except:
+            # timeout, just use the quickest table
+            self._max_depth = 1
+            self._split_words = SplitWords.NEVER
+            self._timeout = None
+            return self._format(data, colors, compact=False, max_str_length=None)
 
     def _get_terminal_size(self):
         try:
