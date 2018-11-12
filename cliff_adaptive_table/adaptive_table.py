@@ -18,6 +18,56 @@ class SplitWords(object):
     NEVER = 'never'
 
 
+ADAPTIVE_TABLE_HELP = {
+    'description': 'Valid boolean values are true, t, yes, y, false, f, no, and n (case-insensitive).',
+    'modifiers':
+    [
+        {
+            'modifier': 'color=<bool>',
+            'description': 'Allow some columns to be colored according to the value (note: this only applies to the top level values, not to values in sub-tables).',
+            'default': 'true'
+        },
+        {
+            'modifier': 'split-table=<bool>',
+            'description': 'Allow table to be split to multiple tables that each have some of the columns.',
+            'default': 'false'
+            },
+        {
+            'modifier': 'column-order=<csv>',
+            'description': 'A comma-separated list of column names. Columns are sorted first by this list and then alphabetically.',
+            'default': 'name,id,status,state'
+        },
+        {
+            'modifier': 'force-frames=<bool>',
+            'description': 'Force frames around all sub-objects.',
+            'default': 'false'
+        },
+        {
+            'modifier': 'horizontal-lines=<bool>',
+            'description': 'Force horizontal lines between each row. Horizontal lines are normally only drawn if either the row above or below is split into multiple lines.',
+            'default': 'false'
+        },
+        {
+            'modifier': 'split-words=<always|except-ids|standard|never>',
+            'description': 'Determines how words in table cell may be split.',
+            'default': 'except-ids',
+            'examples':
+            [
+                'standard - Cell values are split between words, and only words longer than the cell width are split.',
+                'except-ids - Same as standard except that UUIDs and IPv4 addresses are never split.',
+                'always - Split cell values disregarding word limits. Might result in slightly shorter tables.',
+                'never - Turns off splitting of cell values, so the table looks like the table formatter.'
+            ]
+        },
+        {
+            'modifier': 'width=<n>',
+            'description': 'Force a specific terminal width of n characters instead of using the auto-detected value.',
+            'default': 'auto-detected value'
+        }
+    ]
+}
+
+
 class AdaptiveTable(object):
     _MODIFIERS = {'width': modifier.to_int,
                   'force-frames': modifier.boolean,
@@ -360,3 +410,6 @@ class AdaptiveTable(object):
             return cr
         except:
             return 1000, 1000
+
+    def help(self):
+        return ADAPTIVE_TABLE_HELP

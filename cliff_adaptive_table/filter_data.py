@@ -1,6 +1,61 @@
 import modifier
 
 
+FILTER_DATA_HELP = {
+    'description': 'These modifiers are processed in the following order: grep*, head, tail and finally columns and columns-v',
+    'modifiers':
+    [
+        {
+            'modifier': 'grep=<pattern>',
+            'description': 'Print only rows where the pattern (regular expression) matches any of the values. Note that the values are searched recursively.',
+            'examples':
+            [
+                'grep=name - Only print rows where one of the values matches \'name\'.',
+                'grep=name|nombre - Only print rows where one of the values matches either \'name\' or \'nombre\'.',
+                'grep=name grep=nombre - Only print rows that have a value that matches \'name\' and a value that matches \'nombre\'.'
+            ]
+        },
+        {
+            'modifier': 'grep-i=<pattern>',
+            'description': 'Same as grep, but matching is case-insensitive.'
+        },
+        {
+            'modifier': 'grep-v=<pattern>',
+            'description': 'Skip rows that have a value that matches pattern.',
+            'examples':
+            [
+                'grep-v=name - Only print rows where none of the values matches \'name\'.',
+                'grep-v=name|nombre - Only print rows where none of the values matches either \'name\' or \'nombre\'.',
+                'grep-v=name grep-v=nombre - Print all rows except rows that have a value that matches \'name\' and a value that matches \'nombre\'.'
+            ]
+        },
+        {
+            'modifier': [
+                'grep-iv=<pattern>',
+                'grep-vi=<pattern>'
+            ],
+            'description': 'same as grep-v, but matching is case-insensitive.'
+        },
+        {
+            'modifier': 'head=<n>',
+            'description': 'Only print first n rows.'
+        },
+        {
+            'modifier': 'tail=<n>',
+            'description': 'Only print last n rows. Note that tail is processed after head regardless of their order in the command. Thus, if the entire table had 20 rows, head=10 tail=5 means that rows 6-10 are printed (where row number starts at 1).'
+        },
+        {
+            'modifier': 'columns=<pattern>',
+            'description': 'Only print columns whose name match pattern (matching is case-insensitive). If repeated, all columns matching any of the patterns will be printed. Thus, columns=id|name is the same as columns=id columns=name (in contradistiction to grep*). Note that the columns modifier is processed after the grep* modifiers, so the matched values might not be printed.'
+        },
+        {
+            'modifier': 'columns-v=<pattern>',
+            'description': 'Do not print columns whose name match pattern (matching is case-insensitive). If repeated, all columns matching any of the patterns will be ignored. Thus, columns-v=id|name is the same as columns-v=id columns-v=name (in contradistiction to grep*). Note that the columns-v modifier is processed after the grep* modifiers, so the matched values might not be printed.'
+        }
+    ],
+}
+
+
 class FilterData(object):
     MODIFIERS = {'grep': modifier.append_regex,
                  'grep-v': modifier.append_regex,
@@ -66,3 +121,6 @@ class FilterData(object):
 
     def get_modifier_names(self):
         return self.MODIFIERS.keys()
+
+    def help(self):
+        return FILTER_DATA_HELP

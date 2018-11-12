@@ -36,7 +36,7 @@ class AdaptiveTableFormatter(ListFormatter, SingleFormatter):
     def add_argument_group(self, parser):
         group = parser.add_argument_group('adaptive table formatter')
         group.add_argument('-m', '--modifiers', metavar='NAME=VALUE', nargs='*',
-                           help='Modifiers. See https://www.stratoscale.com/docs/adaptive-table-output-format-modifiers/ for details.')
+                           help='Modifiers. Run table modifier list command or see https://www.stratoscale.com/docs/adaptive-table-output-format-modifiers/ for details.')
 
     def _emit(self, data, stdout, parsed_args):
         adaptive_table = AdaptiveTable(color_dict=self.OUTPUT_COLUMN_COLORS)
