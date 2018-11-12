@@ -7,26 +7,26 @@ FILTER_DATA_HELP = {
     [
         {
             'modifier': 'grep=<pattern>',
-            'description': 'Print only rows where the pattern (regular expression) matches any of the values. Note that the values are searched recursively.',
+            'description': 'Displays only those rows containing a value that matches the pattern. The matching is case-sensitive. The pattern can be any regular expression. Note: The values are searched recursively.',
             'examples':
             [
-                'grep=name - Only print rows where one of the values matches \'name\'.',
-                'grep=name|nombre - Only print rows where one of the values matches either \'name\' or \'nombre\'.',
-                'grep=name grep=nombre - Only print rows that have a value that matches \'name\' and a value that matches \'nombre\'.'
+                'grep=name - Displays only those rows containing a value that matches \'name\'.',
+                'grep=name|nombre - Displays only those rows containing a value that matches either \'name\' or \'number\'.',
+                'grep=name grep=nombre - Displays only those rows containing both one value that matches \'name\' and another value that matches \'number\'.'
             ]
         },
         {
             'modifier': 'grep-i=<pattern>',
-            'description': 'Same as grep, but matching is case-insensitive.'
+            'description': 'Same as grep, but the matching is case-insensitive.'
         },
         {
             'modifier': 'grep-v=<pattern>',
-            'description': 'Skip rows that have a value that matches pattern.',
+            'description': 'Displays all rows except those containing any values that match the pattern. The matching is case-sensitive. The pattern can be any regular expression.',
             'examples':
             [
-                'grep-v=name - Only print rows where none of the values matches \'name\'.',
-                'grep-v=name|nombre - Only print rows where none of the values matches either \'name\' or \'nombre\'.',
-                'grep-v=name grep-v=nombre - Print all rows except rows that have a value that matches \'name\' and a value that matches \'nombre\'.'
+                'grep-v=name - Displays all rows except those that contain a value that matches \'name\'.',
+                'grep-v=name|nombre - Displays all rows except those that contain a value that matches either \'name\' or \'nombre\'.',
+                'grep-v=name grep-v=nombre - Displays all rows except those that contain both one value that matches \'name\' and another value that matches \'nombre\'.'
             ]
         },
         {
@@ -34,23 +34,33 @@ FILTER_DATA_HELP = {
                 'grep-iv=<pattern>',
                 'grep-vi=<pattern>'
             ],
-            'description': 'same as grep-v, but matching is case-insensitive.'
+            'description': 'Same as grep-v, but the matching is case-insensitive.'
         },
         {
             'modifier': 'head=<n>',
-            'description': 'Only print first n rows.'
+            'description': 'Display only the first n rows.'
         },
         {
             'modifier': 'tail=<n>',
-            'description': 'Only print last n rows. Note that tail is processed after head regardless of their order in the command. Thus, if the entire table had 20 rows, head=10 tail=5 means that rows 6-10 are printed (where row number starts at 1).'
+            'description': 'Displays only the last n rows. Thus, if a table had 20 rows, -m head=10 tail=5, would display the last five rows of the first ten, or rows 6-10. Note: tail is processed after head regardless of their order in the command.',
         },
         {
             'modifier': 'columns=<pattern>',
-            'description': 'Only print columns whose name match pattern (matching is case-insensitive). If repeated, all columns matching any of the patterns will be printed. Thus, columns=id|name is the same as columns=id columns=name (in contradistiction to grep*). Note that the columns modifier is processed after the grep* modifiers, so the matched values might not be printed.'
+            'description': 'Displays only those columns whose headers match the pattern. The matching is case-insensitive. If repeated, all columns matching any of the patterns will be displayed. The pattern can be any regular expression. Note: The columns modifier is processed after the grep* modifiers, so the matched values might not be displayed.',
+            'examples':
+            [
+                'columns=name - Displays only those columns whose headers match \'name\'.',
+                'columns=name|id or \'columns=name columns=id\' (In contrast to grep=pattern) - Displays only those columns whose headers match either \'name\' or \'id\'.',
+            ]
         },
         {
             'modifier': 'columns-v=<pattern>',
-            'description': 'Do not print columns whose name match pattern (matching is case-insensitive). If repeated, all columns matching any of the patterns will be ignored. Thus, columns-v=id|name is the same as columns-v=id columns-v=name (in contradistiction to grep*). Note that the columns-v modifier is processed after the grep* modifiers, so the matched values might not be printed.'
+            'description': 'Displays all columns except those whose headers match the pattern. The matching is case-insensitive. If repeated, all columns matching any of the patterns will not be displayed. The pattern can be any regular expression. Note: The columns* modifiers are processed after the grep* modifiers, so the matched values might not be displayed.',
+            'examples':
+            [
+                'columns-v=name - Displays all columns except those whose headers match \'name\'.',
+                'columns-v=name|id or \'columns-v=name columns-v=id\' (In contrast to grep-v=<pattern>) - Displays all columns except those whose headers match either \'name\' or \'id\'.',
+            ]
         }
     ],
 }

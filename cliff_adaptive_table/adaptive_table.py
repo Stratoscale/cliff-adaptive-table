@@ -19,49 +19,49 @@ class SplitWords(object):
 
 
 ADAPTIVE_TABLE_HELP = {
-    'description': 'Valid boolean values are true, t, yes, y, false, f, no, and n (case-insensitive).',
+    'description': 'Valid Boolean values are true, t, yes, y, false, f, no, and n (case-insensitive).',
     'modifiers':
     [
         {
             'modifier': 'color=<bool>',
-            'description': 'Allow some columns to be colored according to the value (note: this only applies to the top level values, not to values in sub-tables).',
+            'description': 'Determines whether to display colored outputs in color. (Note: If \'true\', it applies only to the values in top level tables, but not those in sub-tables.)',
             'default': 'true'
         },
         {
             'modifier': 'split-table=<bool>',
-            'description': 'Allow table to be split to multiple tables that each have some of the columns.',
+            'description': 'When output exceeds terminal width, determines whether to split it into multiple, terminal-width tables, each containing some of the columns.',
             'default': 'false'
             },
         {
             'modifier': 'column-order=<csv>',
-            'description': 'A comma-separated list of column names. Columns are sorted first by this list and then alphabetically.',
+            'description': 'Displays the columns according to a comma-separated list of column headers. The unlisted columns are displayed after the listed ones in alphabetical order.',
             'default': 'name,id,status,state'
         },
         {
             'modifier': 'force-frames=<bool>',
-            'description': 'Force frames around all sub-objects.',
+            'description': 'Determines whether to display frames around all sub-tables',
             'default': 'false'
         },
         {
             'modifier': 'horizontal-lines=<bool>',
-            'description': 'Force horizontal lines between each row. Horizontal lines are normally only drawn if either the row above or below is split into multiple lines.',
+            'description': 'Determines whether to display horizontal lines between each row of output. Horizontal lines are normally only drawn if either the row above or below is split into multiple lines.',
             'default': 'false'
         },
         {
             'modifier': 'split-words=<always|except-ids|standard|never>',
-            'description': 'Determines how words in table cell may be split.',
+            'description': 'Determines whether to split words when displaying cell values that are longer than their cell width. There are four different policies: standard|except-ids|always|never.',
             'default': 'except-ids',
             'examples':
             [
-                'standard - Cell values are split between words, and only words longer than the cell width are split.',
+                'standard - Cell values are split only between words. Words are not split unless a word is longer than the cell width.',
                 'except-ids - Same as standard except that UUIDs and IPv4 addresses are never split.',
-                'always - Split cell values disregarding word limits. Might result in slightly shorter tables.',
-                'never - Turns off splitting of cell values, so the table looks like the table formatter.'
+                'always - Cell values may be split both between words and within words. This may result in slightly shorter tables.',
+                'never - Cell values are never split. This causes the table to look like the output of the regular table formatter.'
             ]
         },
         {
             'modifier': 'width=<n>',
-            'description': 'Force a specific terminal width of n characters instead of using the auto-detected value.',
+            'description': 'Sets the width of the terminal to n characters instead of using the auto-detected value.',
             'default': 'auto-detected value'
         }
     ]
