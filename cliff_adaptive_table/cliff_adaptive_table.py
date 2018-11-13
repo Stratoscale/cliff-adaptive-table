@@ -5,33 +5,13 @@ from filter_data import FilterData
 
 
 class AdaptiveTableFormatter(ListFormatter, SingleFormatter):
-    COLOR_GOOD = '\033[32m'  # green
-    COLOR_BAD = '\033[31m'  # red
-    COLOR_ACTIVE = '\033[33;1m'  # yellow
-    COLOR_NEUTRAL = '\033[35m'  # magenta
-    OUTPUT_COLUMN_COLORS = {
-        'status': {
-            'active': COLOR_GOOD,
-            'ready': COLOR_GOOD,
-            'error': COLOR_BAD,
-            'migrating': COLOR_NEUTRAL,
-            # for autoscaling groups
-            'deleting': COLOR_ACTIVE,
-            # for hot-upgrade
-            'Preparing': COLOR_NEUTRAL,
-            'Pending': COLOR_NEUTRAL,
-            'Ready to Install': COLOR_NEUTRAL,
-            'Installing': COLOR_ACTIVE,
-            'Done': COLOR_GOOD,
-        },
-        'state': {  # for nodes
-            'active': COLOR_GOOD,
-            'down': COLOR_BAD,
-            'up': COLOR_GOOD,
-            'in_progress': COLOR_NEUTRAL,
-            'in_maintenance': COLOR_NEUTRAL,
-        }
-    }
+    # OUTPUT_COLUMN_COLORS is a dictionary whose keys are column names
+    # and whose values determine coloring for values.  for example,
+    # {'status': {'success': '\033[32;1m',
+    #             'failure': '\033[31;1m'}}
+    # will color 'success' values in 'status' fields in bright green
+    # and 'failure' values in bright red
+    OUTPUT_COLUMN_COLORS = {}
 
     def add_argument_group(self, parser):
         group = parser.add_argument_group('adaptive table formatter')

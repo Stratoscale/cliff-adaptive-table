@@ -2,7 +2,7 @@ import modifier
 
 
 FILTER_DATA_HELP = {
-    'description': 'These modifiers are processed in the following order: grep*, head, tail and finally columns and columns-v',
+    'description': 'These modifiers are processed in the following order: grep*, head, tail and finally columns and columns-v.',
     'modifiers':
     [
         {
