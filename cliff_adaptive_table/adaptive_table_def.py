@@ -1,5 +1,5 @@
 class AdaptiveTableDef(object):
-    def __init__(self, widths, depth, compact, force_frames, horizontal_lines, indent, headers):
+    def __init__(self, widths, depth, compact, force_frames, horizontal_lines, indent, transpose, headers):
         self._widths = widths
         self._depth = depth
         self._compact = compact
@@ -7,6 +7,7 @@ class AdaptiveTableDef(object):
         self._force_frames = force_frames
         self._horizontal_lines = horizontal_lines
         self._indent = indent
+        self._transpose = transpose
         self._set_separators(widths, depth, compact, force_frames)
 
     def _set_separators(self, widths, depth, compact, force_frames):
@@ -31,14 +32,16 @@ class AdaptiveTableDef(object):
             return self._force_frames or self._depth == 0  # separator if outer table or --force-frames
         if self._depth == 0 and row_index == 0:  # separator before first row
             return True
-        if row_index == 1 and self._headers:  # separator after the header
+        if row_index == 1 and self._headers and not self._transpose:  # separator after the header
             return True
         return max_lines > 1 or prev_max_lines > 1  # separator between rows with more than one line
 
     def get_separator(self, row_index, max_lines, prev_max_lines):
         if not self._separator_needed(row_index, max_lines, prev_max_lines):
             return None
-        return self._header_separator if row_index == 1 and self._headers else self._line_separator
+        if row_index == 1 and self._headers and not self._transpose:
+            return self._header_separator
+        return self._line_separator
 
     def get_end_separator(self):
         return self._line_separator

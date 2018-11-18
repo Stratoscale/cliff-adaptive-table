@@ -63,6 +63,11 @@ ADAPTIVE_TABLE_HELP = {
             'modifier': 'width=<n>',
             'description': 'Sets the width of the terminal to n characters instead of using the auto-detected value.',
             'default': 'auto-detected value'
+        },
+        {
+            'modifier': 'transpose=<bool>',
+            'description': 'Rotate the table diagonally, such that the rows are turned into columns and columns are turned into rows. Useful when there are few complex objects.',
+            'default': 'false',
         }
     ]
 }
@@ -75,7 +80,8 @@ class AdaptiveTable(object):
                   'split-words': modifier.to_str,
                   'column-order': modifier.csv,
                   'split-table': modifier.boolean,
-                  'color': modifier.boolean}
+                  'color': modifier.boolean,
+                  'transpose': modifier.boolean}
     _DEFAULT_COLUMN_ORDER = ['id', 'name', 'status', 'state']
     _IP_PATTERN = re.compile('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$')
     _TTL = 1.0  # maximum time to try to optimize the table
@@ -90,6 +96,7 @@ class AdaptiveTable(object):
                  horizontal_lines=False,
                  split_words=SplitWords.EXCEPT_IDS,
                  column_order=_DEFAULT_COLUMN_ORDER,
+                 transpose=False,
                  ttl=_TTL):
         self._color_dict = color_dict or {}
         self._color = color
@@ -100,6 +107,8 @@ class AdaptiveTable(object):
         self._split_words = split_words
         self._horizontal_lines = horizontal_lines
         self._column_order = column_order or self._DEFAULT_COLUMN_ORDER
+        self._transpose = transpose
+        self._transposable = True
         self._set_key_sorter()
         if ttl is None:
             self._timeout = None
@@ -123,24 +132,42 @@ class AdaptiveTable(object):
         else:
             self._key_sorter = lambda item: item
 
-    def _format_table(self, headers, raw_data, all_colors, depth, compact):
+    def _format_table(self, raw_headers, raw_data, all_colors, depth, compact):
         if not raw_data:
             return unicode(raw_data)
-        all_data, all_widths = self._prepare_data_for_formatting(headers, raw_data)
+
+        transpose = (depth == 0 and self._transpose and self._transposable)
+
+        if transpose:
+            transposed = self._transpose_table(raw_headers, raw_data)
+            headers = []
+        else:
+            transposed = None
+            headers = raw_headers
+
+        all_data, all_widths = self._prepare_data_for_formatting(headers, transposed or raw_data)
 
         lines = []
         first_column = 0
-        while headers is None or first_column < len(headers):
-            if depth == 0 and headers and self._split_table:
-                last_column = len(headers) + 1
+        while raw_headers is None or first_column < len(raw_headers):
+            if depth == 0 and raw_headers and self._split_table:
+                last_column = len(raw_headers) + 1
                 while last_column > first_column:
                     widths = all_widths[first_column:last_column]
-                    indent = 0 if first_column == 0 else 2
-                    table_def = AdaptiveTableDef(widths, depth, compact, self._force_frames, self._horizontal_lines, indent, headers[first_column:last_column])
+                    if transpose:
+                        widths = [all_widths[0]] + widths
+                    indent = 0 if first_column == 0 or transposed else 2
+                    table_def = AdaptiveTableDef(widths, depth, compact, self._force_frames, self._horizontal_lines, indent, self._transpose, raw_headers[first_column:last_column])
                     if table_def.total_width() <= self._width or first_column + 1 == last_column:
-                        data = [one_row[first_column:last_column] for one_row in all_data]
+                        if transpose:
+                            data = [one_row[:1] + one_row[first_column:last_column] for one_row in all_data]
+                        else:
+                            data = [one_row[first_column:last_column] for one_row in all_data]
                         if all_colors:
-                            colors = [one_row[first_column:last_column] for one_row in all_colors]
+                            if transpose:
+                                colors = [[None] + one_row[first_column:last_column] for one_row in all_colors]
+                            else:
+                                colors = [one_row[first_column:last_column] for one_row in all_colors]
                         else:
                             colors = None
                         first_column = last_column
@@ -153,10 +180,12 @@ class AdaptiveTable(object):
                     colors = None
                 data = all_data
                 widths = all_widths
-                table_def = AdaptiveTableDef(widths, depth, compact, self._force_frames, self._horizontal_lines, 0, headers)
+                table_def = AdaptiveTableDef(widths, depth, compact, self._force_frames, self._horizontal_lines, 0, self._transpose, raw_headers)
 
+            if lines and transpose:
+                lines.append('')
             self._format_columns(table_def, widths, colors, depth, data, lines)
-            if not headers or depth > 0 or not self._split_table:
+            if not raw_headers or depth > 0 or not self._split_table:
                 break
         return '\n'.join(lines)
 
@@ -389,10 +418,19 @@ class AdaptiveTable(object):
             table = self._format(data, colors, compact=False, max_str_length=None)
         return table
 
+    def _transpose_table(self, headers, data):
+        transposed = []
+        for index in xrange(len(data[0])):
+            transposed.append([headers[index]] + [row[index] for row in data])
+        return transposed
+
     def format(self, data):
         if isinstance(data, (list, tuple)) and len(data) == 1:
             data = data[0]
+        self._transposable = isinstance(data, (list, tuple))
         colors = self._get_data_colors(data)
+        if colors and self._transpose and self._transposable:
+            colors = self._transpose_table([None] * len(colors[1]), colors[1:])
         try:
             return self._adaptive_format(data, colors)
         except:
