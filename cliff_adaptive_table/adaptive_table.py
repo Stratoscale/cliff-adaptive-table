@@ -300,7 +300,12 @@ class AdaptiveTable(object):
                 non_dicts_table = [[self._format_cell(value, depth + 1, compact, max_str_length)] for value in non_dicts]
                 return self._format_table(None, non_dicts_table, None, depth, compact)
             return formatted
-        return unicode(data)
+        if data is True:
+            return 'true'
+        elif data is False:
+            return 'false'
+        else:
+            return unicode(data)
 
     def _format(self, data, colors, compact, max_str_length):
         if isinstance(data, dict):
