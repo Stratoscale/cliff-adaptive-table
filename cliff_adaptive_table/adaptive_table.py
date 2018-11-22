@@ -153,6 +153,8 @@ class AdaptiveTable(object):
             if depth == 0 and raw_headers and self._split_table:
                 last_column = len(raw_headers) + 1
                 while last_column > first_column:
+                    if self._timeout and time.time() > self._timeout:
+                        raise RuntimeError
                     widths = all_widths[first_column:last_column]
                     if transpose:
                         widths = [all_widths[0]] + widths
@@ -429,6 +431,7 @@ class AdaptiveTable(object):
             data = data[0]
         self._transposable = isinstance(data, (list, tuple))
         colors = self._get_data_colors(data)
+        orig_colors = colors
         if colors and self._transpose and self._transposable:
             colors = self._transpose_table([None] * len(colors[1]), colors[1:])
         try:
@@ -437,8 +440,10 @@ class AdaptiveTable(object):
             # timeout, just use the quickest table
             self._max_depth = 1
             self._split_words = SplitWords.NEVER
+            self._split_table = False
+            self._transpose = False
             self._timeout = None
-            return self._format(data, colors, compact=False, max_str_length=None)
+            return self._format(data, orig_colors, compact=False, max_str_length=None)
 
     def _get_terminal_size(self):
         try:
