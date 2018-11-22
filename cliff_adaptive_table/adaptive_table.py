@@ -66,9 +66,14 @@ ADAPTIVE_TABLE_HELP = {
         },
         {
             'modifier': 'transpose=<bool>',
-            'description': 'Rotate the table diagonally, such that the rows are turned into columns and columns are turned into rows. Useful when there are few complex objects.',
+            'description': 'Rotates the table, turning the rows into columns and the columns into rows. Useful when there are few complex objects.',
             'default': 'false',
-        }
+        },
+        {
+            'modifier': 'count=<bool>',
+            'description': 'Displays the number of objects in the table.',
+            'default': 'false',
+        },
     ]
 }
 
@@ -81,7 +86,8 @@ class AdaptiveTable(object):
                   'column-order': modifier.csv,
                   'split-table': modifier.boolean,
                   'color': modifier.boolean,
-                  'transpose': modifier.boolean}
+                  'transpose': modifier.boolean,
+                  'count': modifier.boolean}
     _DEFAULT_COLUMN_ORDER = ['id', 'name', 'status', 'state']
     _IP_PATTERN = re.compile('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$')
     _TTL = 1.0  # maximum time to try to optimize the table
@@ -97,6 +103,7 @@ class AdaptiveTable(object):
                  split_words=SplitWords.EXCEPT_IDS,
                  column_order=_DEFAULT_COLUMN_ORDER,
                  transpose=False,
+                 count=False,
                  ttl=_TTL):
         self._color_dict = color_dict or {}
         self._color = color
@@ -109,6 +116,8 @@ class AdaptiveTable(object):
         self._column_order = column_order or self._DEFAULT_COLUMN_ORDER
         self._transpose = transpose
         self._transposable = True
+        self._count = count
+        self._num_objects = None
         self._set_key_sorter()
         if ttl is None:
             self._timeout = None
@@ -200,6 +209,8 @@ class AdaptiveTable(object):
             self._format_columns(table_def, widths, colors, depth, data, lines)
             if not raw_headers or depth > 0 or not self._split_table:
                 break
+        if depth == 0 and self._num_objects is not None:
+            lines.extend(['', 'object count: %s' % self._num_objects])
         return '\n'.join(lines)
 
     def _prepare_data_for_formatting(self, headers, raw_data):
@@ -437,7 +448,14 @@ class AdaptiveTable(object):
             transposed.append([row[index] for row in data])
         return transposed
 
+    def _count_objects(self, data):
+        if isinstance(data, (list, tuple, dict)):
+            return len(data)
+        return 1 if data else 0
+
     def format(self, data):
+        if self._count:
+            self._num_objects = self._count_objects(data)
         if isinstance(data, (list, tuple)) and len(data) == 1:
             data = data[0]
         self._transposable = isinstance(data, (list, tuple))
