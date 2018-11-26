@@ -141,9 +141,11 @@ class AdaptiveTable(object):
         if transpose:
             transposed = self._transpose_table(raw_headers, raw_data)
             headers = []
+            vertical = True
         else:
             transposed = None
             headers = raw_headers
+            vertical = not raw_headers
         header_width = max(len(header) for header in raw_headers) if raw_headers else 0
 
         all_data, all_widths = self._prepare_data_for_formatting(headers, transposed or raw_data)
@@ -161,7 +163,7 @@ class AdaptiveTable(object):
                     if transpose:
                         widths = [header_width] + widths
                     indent = 0 if first_column == 0 or transposed else 2
-                    table_def = AdaptiveTableDef(widths, depth, compact, self._force_frames, self._horizontal_lines, indent, self._transpose, raw_headers[first_column:last_column])
+                    table_def = AdaptiveTableDef(widths, depth, compact, self._force_frames, self._horizontal_lines, indent, self._transpose, vertical, raw_headers[first_column:last_column])
                     if table_def.total_width() <= self._width or first_column + 1 == last_column:
                         if transpose:
                             data = [[[raw_headers[index]]] + one_row[first_column:last_column] for index, one_row in enumerate(all_data)]
@@ -191,7 +193,7 @@ class AdaptiveTable(object):
                 else:
                     data = all_data
                     widths = all_widths
-                table_def = AdaptiveTableDef(widths, depth, compact, self._force_frames, self._horizontal_lines, 0, self._transpose, raw_headers)
+                table_def = AdaptiveTableDef(widths, depth, compact, self._force_frames, self._horizontal_lines, 0, self._transpose, vertical, raw_headers)
 
             if lines and transpose:
                 lines.append('')
