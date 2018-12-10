@@ -15,13 +15,16 @@ class AdaptiveTableFormatter(ListFormatter, SingleFormatter):
 
     def add_argument_group(self, parser):
         group = parser.add_argument_group('adaptive table formatter')
-        group.add_argument('-m', '--modifiers', metavar='NAME=VALUE', nargs='*',
+        group.add_argument('-m', '--modifiers', metavar='NAME=VALUE', nargs='*', action='append',
                            help='Modifiers. Run table modifier list command or see https://www.stratoscale.com/docs/adaptive-table-output-format-modifiers/ for details.')
 
     def _emit(self, data, stdout, parsed_args):
         adaptive_table = AdaptiveTable(color_dict=self.OUTPUT_COLUMN_COLORS)
         filter_data = FilterData()
-        non_table_modifiers = adaptive_table.parse_modifiers(parsed_args.modifiers)
+        modifiers = []
+        for modifier_list in (parsed_args.modifiers or []):
+            modifiers.extend(modifier_list)
+        non_table_modifiers = adaptive_table.parse_modifiers(modifiers)
         invalid_modifiers = filter_data.parse_modifiers(non_table_modifiers)
         if invalid_modifiers:
             stdout.write('invalid modifiers: %s\n' % (' '.join(invalid_modifiers)))
