@@ -357,6 +357,8 @@ class AdaptiveTable(object):
             return 'true'
         elif data is False:
             return 'false'
+        elif data is None:
+            return 'none'
         else:
             return unicode(data)
 
