@@ -397,6 +397,8 @@ class AdaptiveTable(object):
 
         if not self._color:
             return None
+        if not data:
+            return []
         if isinstance(data, dict):
             return [[None, color] for color in _get_dict_colors(sorted(data.iterkeys(), key=self._key_sorter), data)]
         if isinstance(data, (list, tuple)):
