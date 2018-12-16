@@ -148,7 +148,7 @@ class AdaptiveTable(object):
         transpose = (depth == 0 and self._transpose and self._transposable)
 
         if transpose:
-            transposed = self._transpose_table(raw_headers, raw_data)
+            transposed = self._transpose_table(raw_data)
             headers = []
             vertical = True
         else:
@@ -446,7 +446,7 @@ class AdaptiveTable(object):
             table = self._format(data, colors, compact=False, max_str_length=None)
         return table
 
-    def _transpose_table(self, headers, data):
+    def _transpose_table(self, data):
         transposed = []
         for index in xrange(len(data[0])):
             transposed.append([row[index] for row in data])
@@ -466,7 +466,7 @@ class AdaptiveTable(object):
         colors = self._get_data_colors(data)
         orig_colors = colors
         if colors and self._transpose and self._transposable:
-            colors = self._transpose_table([None] * len(colors[1]), colors[1:])
+            colors = self._transpose_table(colors[1:])
         try:
             return self._adaptive_format(data, colors)
         except:
