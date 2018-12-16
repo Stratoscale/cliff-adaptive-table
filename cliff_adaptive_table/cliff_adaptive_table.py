@@ -12,11 +12,11 @@ class AdaptiveTableFormatter(ListFormatter, SingleFormatter):
     # will color 'success' values in 'status' fields in bright green
     # and 'failure' values in bright red
     OUTPUT_COLUMN_COLORS = {}
+    MODIFIER_HELP = 'Modifiers - see adaptive_table.py and filter_data.py for documentation'
 
     def add_argument_group(self, parser):
         group = parser.add_argument_group('adaptive table formatter')
-        group.add_argument('-m', '--modifiers', metavar='NAME=VALUE', nargs='*', action='append',
-                           help='Modifiers. Run table modifier list command or see https://www.stratoscale.com/docs/adaptive-table-output-format-modifiers/ for details.')
+        group.add_argument('-m', '--modifiers', metavar='NAME=VALUE', nargs='*', action='append', help=self.MODIFIER_HELP)
 
     def _emit(self, data, stdout, parsed_args):
         adaptive_table = AdaptiveTable(color_dict=self.OUTPUT_COLUMN_COLORS)
