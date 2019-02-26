@@ -352,7 +352,7 @@ class AdaptiveTable(object):
             non_dicts = [self._format_cell(item, depth + 1, compact, max_str_length) for item in data if not isinstance(item, dict)]
             if non_dicts:
                 non_dicts_table = [[self._format_cell(value, depth + 1, compact, max_str_length)] for value in non_dicts]
-                return self._format_table(None, non_dicts_table, None, depth, compact)
+                formatted += '\n' + self._format_table(None, non_dicts_table, None, depth, compact)
             return formatted
         if data is True:
             return 'true'
