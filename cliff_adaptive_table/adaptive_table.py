@@ -323,6 +323,8 @@ class AdaptiveTable(object):
         for item in data:
             if isinstance(item, dict):
                 keys.update(item.iterkeys())
+            else:
+                keys.add('')
         return sorted(keys, key=self._key_sorter)
 
     def _format_cell(self, data, depth, compact, max_str_length):
@@ -345,15 +347,16 @@ class AdaptiveTable(object):
             headers = []
             keys = self._get_keys_of_a_list_of_dicts(data)
             headers = [self._split_string(key, max_str_length) for key in keys]
-            for item in data:
-                if isinstance(item, dict):
+            num_dicts = len([item for item in data if isinstance(item, dict)])
+            if num_dicts > 0:  # if there are dicts, imagine non-dicts are inside dicts with a single empty string key
+                for item in data:
+                    if not isinstance(item, dict):
+                        item = {'': item}
                     table.append([self._format_cell(item.get(key, ''), depth + 1, compact, max_str_length) for key in keys])
-            formatted = self._format_table(headers, table, None, depth, compact)
-            non_dicts = [self._format_cell(item, depth + 1, compact, max_str_length) for item in data if not isinstance(item, dict)]
-            if non_dicts:
-                non_dicts_table = [[self._format_cell(value, depth + 1, compact, max_str_length)] for value in non_dicts]
-                formatted += '\n' + self._format_table(None, non_dicts_table, None, depth, compact)
-            return formatted
+                return self._format_table(headers, table, None, depth, compact)
+            else:  # only non-dicts in the list
+                table = [[self._format_cell(value, depth + 1, compact, max_str_length)] for value in data]
+                return self._format_table(None, table, None, depth, compact)
         if data is True:
             return 'true'
         elif data is False:
@@ -374,14 +377,16 @@ class AdaptiveTable(object):
             headers = []
             keys = self._get_keys_of_a_list_of_dicts(data)
             headers = [self._split_string(key, max_str_length) for key in keys]
-            for item in data:
-                if isinstance(item, dict):
+            num_dicts = len([item for item in data if isinstance(item, dict)])
+            if num_dicts > 0:  # if there are dicts, imagine non-dicts are inside dicts with a single empty string key
+                for item in data:
+                    if not isinstance(item, dict):
+                        item = {'': item}
                     table.append([self._format_cell(item.get(key, ''), 1, compact, max_str_length) for key in keys])
-            formatted = self._format_table(headers, table, colors, 0, compact)
-            non_dicts = [self._format_cell(item, 1, compact, max_str_length) for item in data if not isinstance(item, dict)]
-            if non_dicts:
-                formatted += '\n' + self._format_table(None, non_dicts, colors, 0, compact)
-            return formatted
+                return self._format_table(headers, table, colors, 0, compact)
+            else:  # only non-dicts in the list
+                table = [[self._format_cell(value, 1, compact, max_str_length)] for value in data]
+                return self._format_table(None, table, colors, 0, compact)
 
         return self._format_cell(data, 1, compact, max_str_length)
 
