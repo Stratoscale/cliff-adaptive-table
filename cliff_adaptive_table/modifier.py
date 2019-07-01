@@ -25,6 +25,15 @@ def append_regex(recognized, key, value, flags=0):
     recognized[key].append(pattern)
 
 
+def sort(recognized, key, value):
+    tokens = value.split(':', 1)
+    if len(tokens) > 1:
+        assert tokens[0] in ('a', 'A', 'd', 'D')
+    else:
+        tokens = ['a', tokens[0]]
+    recognized[key] = (tokens[0] in ('d', 'D'), tokens[1])
+
+
 def append_case_insensitive_regex(recognized, key, value):
     append_regex(recognized, key, value, re.IGNORECASE)
 

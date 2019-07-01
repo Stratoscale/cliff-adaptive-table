@@ -63,7 +63,17 @@ FILTER_DATA_HELP = {
                 'columns-v=name - Displays all columns except those whose headers match \'name\'.',
                 'columns-v=name|id or \'columns-v=name columns-v=id\' (In contrast to grep-v=<pattern>) - Displays all columns except those whose headers match either \'name\' or \'id\'.',
             ]
-        }
+        },
+        {
+            'modifier': 'sort=[<order>:]<column name>',
+            'description': 'Sorts rows according to the values in a specific column. Note: column name must be exact. Order, if given, is either \'a\' or \'A\' for ascending, or \'d\' or \'D\' for descending.',
+            'examples':
+            [
+                'sort=score - Sorts columns according the the values in column \'score\' in ascending order',
+                'sort=A:name - Sorts columns according the the values in column \'name\' in ascending order',
+                'sort=d:age - Sorts columns according the the values in column \'age\' in descending order',
+            ]
+        },
     ],
 }
 
@@ -79,7 +89,8 @@ class FilterData(object):
                  'columns': modifier.append_case_insensitive_regex,
                  'columns-v': modifier.append_case_insensitive_regex,
                  'head': modifier.to_int,
-                 'tail': modifier.to_int}
+                 'tail': modifier.to_int,
+                 'sort': modifier.sort}
 
     def _filter_data(self, data, greps, reverse_greps):
         def _matches(data, pattern):
@@ -133,6 +144,11 @@ class FilterData(object):
                 data = data[:self._modifiers['head']]
             if 'tail' in self._modifiers:
                 data = data[-self._modifiers['tail']:]
+        sort_by = self._modifiers.get('sort')
+        if sort_by:
+            reverse, sort_key = sort_by
+            if isinstance(data, (list, tuple)) and all(isinstance(row, dict) for row in data):
+                data.sort(key=lambda row: row.get(sort_key), reverse=reverse)
         return data
 
     def get_modifier_names(self):
