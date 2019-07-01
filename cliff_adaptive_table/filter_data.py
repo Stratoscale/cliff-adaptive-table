@@ -32,7 +32,9 @@ FILTER_DATA_HELP = {
         {
             'modifier': [
                 'grep-iv=<pattern>',
-                'grep-vi=<pattern>'
+                'grep-vi=<pattern>',
+                'grep-i-v=<pattern>',
+                'grep-v-i=<pattern>'
             ],
             'description': 'Same as grep-v, but the matching is case-insensitive.'
         },
@@ -72,6 +74,8 @@ class FilterData(object):
                  'grep-i': modifier.append_case_insensitive_regex,
                  'grep-iv': modifier.append_case_insensitive_regex,
                  'grep-vi': modifier.append_case_insensitive_regex,
+                 'grep-i-v': modifier.append_case_insensitive_regex,
+                 'grep-v-i': modifier.append_case_insensitive_regex,
                  'columns': modifier.append_case_insensitive_regex,
                  'columns-v': modifier.append_case_insensitive_regex,
                  'head': modifier.to_int,
@@ -119,7 +123,9 @@ class FilterData(object):
 
     def filter_data(self, data):
         greps = self._modifiers.get('grep', []) + self._modifiers.get('grep-i', [])
-        reverse_greps = self._modifiers.get('grep-v', []) + self._modifiers.get('grep-vi', []) + self._modifiers.get('grep-iv', [])
+        reverse_greps = []
+        for name in ('grep-v', 'grep-vi', 'grep-iv', 'grep-v-i', 'grep-i-v'):
+            reverse_greps.extend(self._modifiers.get(name, []))
         data = self._filter_data(data, greps, reverse_greps)
         data = self._filter_columns(data, self._modifiers.get('columns', []), self._modifiers.get('columns-v', []))
         if isinstance(data, list):
