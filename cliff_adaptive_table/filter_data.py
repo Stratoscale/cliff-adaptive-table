@@ -11,8 +11,8 @@ FILTER_DATA_HELP = {
             'examples':
             [
                 'grep=name - Displays only those rows containing a value that matches \'name\'.',
-                'grep=name|nombre - Displays only those rows containing a value that matches either \'name\' or \'number\'.',
-                'grep=name grep=nombre - Displays only those rows containing both one value that matches \'name\' and another value that matches \'number\'.'
+                'grep=name|nombre - Displays only those rows containing a value that matches either \'name\' or \'nombre\'.',
+                'grep=name grep=nombre - Displays only those rows containing both one value that matches \'name\' and another value that matches \'nombre\'.'
             ]
         },
         {
@@ -69,9 +69,9 @@ FILTER_DATA_HELP = {
             'description': 'Sorts rows according to the values in a specific column. Note: column name must be exact. Order, if given, is either \'a\' or \'A\' for ascending, or \'d\' or \'D\' for descending.',
             'examples':
             [
-                'sort=score - Sorts columns according the the values in column \'score\' in ascending order',
-                'sort=A:name - Sorts columns according the the values in column \'name\' in ascending order',
-                'sort=d:age - Sorts columns according the the values in column \'age\' in descending order',
+                'sort=score - Sorts columns according to the values in column \'score\' in ascending order',
+                'sort=A:name - Sorts columns according to the values in column \'name\' in ascending order',
+                'sort=d:age - Sorts columns according to the values in column \'age\' in descending order',
             ]
         },
     ],
